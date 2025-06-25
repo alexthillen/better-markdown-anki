@@ -1,6 +1,18 @@
 
-#front-card,
-#back-card,
-#extra-card {
+#front-card-basic,
+#back-card-basic,
+#extra-card-basic {
   display: none !important;
+}
+
+
+#front-card-cloze,
+#back-card-cloze,
+#extra-card-cloze {
+  display: none !important;
+}
+
+
+.cloze {
+    color: rgb(64, 176, 224);
 }

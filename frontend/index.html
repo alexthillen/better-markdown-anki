@@ -1,13 +1,41 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+<html class="linux chrome" dir="ltr" data-bs-theme="light"><head>
+    <title>card layout</title>
+<!-- <base href="http://127.0.0.1:45901/"><link rel="stylesheet" type="text/css" href="http://127.0.0.1:45901/_anki/css/webview.css"> -->
+<script type="module" src="/src/main.jsx"></script>
+</head>
+
+<body class="card card1 isLin fancy">
+<script src="http://127.0.0.1:45901/_anki/js/webview.js"></script>
+<script src="http://127.0.0.1:45901/_anki/js/mathjax.js"></script>
+<script src="http://127.0.0.1:45901/_anki/js/vendor/mathjax/tex-chtml-full.js"></script>
+<script src="http://127.0.0.1:45901/_anki/js/reviewer.js"></script>
+
+<div id="_mark" hidden="">★</div>
+<div id="_flag" hidden="">⚑</div>
+
+<div id="front-card-cloze" class="field">
+The <span class="cloze" data-cloze="&quot;Tokens/sec&quot;" data-ordinal="1">[...]</span> metric demonstrated significant training speed advantages of FlashAttentionV3 across various `ATTENTION_TYPES` and `SEQLENS`.<br><br><br>\$123 is greater than \%123 or 88\$.<br><br>\$123 is greater than \%123 or 88\$.<br><br><br>```python<br>print("Hello <span class="cloze" data-cloze="World" data-ordinal="1">[...]</span>")<br>```
+</div>
+<div id="back-card-cloze" class="field">
+The <span class="cloze" data-ordinal="1">"Tokens/sec"</span> metric demonstrated significant training speed advantages of FlashAttentionV3 across various `ATTENTION_TYPES` and `SEQLENS`.<br><br><br>\$123 is greater than \%123 or 88\$.<br><br>\$123 is greater than \%123 or 88\$.<br><br><br>```python<br>print("Hello <span class="cloze" data-ordinal="1">World</span>")<br>```
+</div>
+<div id="extra-card-cloze" class="field">
+This indicates that even with optimized attention mechanisms, there are still memory limitations that can be hit at very long sequence lengths, leading to a sharp decline in performance.
+</div>
+
+
+<div id="front-card-basic">
+### What is the **general relationship between PCA and k-means clustering**?
+</div>
+<div id="back-card-basic">
+Both PCA and k-means clustering are solving the same fundamental problem of **compressing data with maximum fidelity** (minimizing reconstruction error), but under **different constraints** on the model complexity. They can be unified under a broader class of techniques known as **matrix factorization methods**.
+</div>
+<div id="extra-card-basic">
+In PCA, the matrix $W$ (principal components) must be orthogonal, while in k-means, $W$ (cluster centroids) is arbitrary, and $Z$ (cluster assignments) encodes which cluster each point belongs to.
+</div>
+
+
+</div>
+</body></html>
+
+
