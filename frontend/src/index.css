@@ -14,5 +14,13 @@
 
 
 .cloze {
-    color: rgb(64, 176, 224);
+    color: rgb(64, 176, 224) !important;
+}
+
+.cloze * {
+    color: inherit !important;
+}
+
+#qa {
+    display: none;
 }

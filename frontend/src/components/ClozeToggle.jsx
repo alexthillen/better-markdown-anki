@@ -1,12 +1,12 @@
 import { Switch, useMantineColorScheme } from '@mantine/core';
 import React, { useEffect, useState } from 'react'
 
-function ClozeToggle({ spanElement, label, back }) {
+function ClozeToggle({ spanElement, label, text }) {
     const [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
         setIsActive(false);
-    }, [back]);
+    }, [text]);
 
     const toggleCloze = (spanElement) => {
         const currentDataCloze = spanElement.getAttribute('data-cloze');

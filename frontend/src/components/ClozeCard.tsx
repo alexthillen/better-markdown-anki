@@ -9,8 +9,8 @@ function removeClozeSpans(htmlString) {
     doc.body.innerHTML = htmlString;
 
     // Find all spans with class "cloze"
-    const clozeSpans = doc.querySelectorAll('span.cloze');
-
+    const clozeSpans = doc.querySelectorAll('span.cloze, span.cloze-inactive');
+    
     clozeSpans.forEach(span => {
         // Replace the span with its content (unwrap)
         span.outerHTML = span.innerHTML;
@@ -98,6 +98,7 @@ function ClozeCard(
         back: 'Loading...',
         extra: 'Loading...'
     });
+    const [resetToggle, setResetToggle] = useState(0);
     const getBorderStyle = (borderColor) => (theme) => {
         const [colorKey, shadeStr] = borderColor.split('.');
         const shade = parseInt(shadeStr, 10);
@@ -115,8 +116,16 @@ function ClozeCard(
         return mathRes;
     }
 
+    function symmetricConcat(s1, s2) {
+        return [s1, s2].sort().join('');
+    }
+
     useEffect(() => {
         console.log('ClozeCard useEffect triggered');
+        if (clozeCardContent.back !== nodeToMarkdown(backNode)) {
+            console.log('ClozeCard back content changed, resetting toggles');
+            setResetToggle(prev => prev + 1); // Increment to reset toggles
+        }
 
         setClozeCardContent({
             front: nodeToMarkdown(frontNode),
@@ -135,7 +144,7 @@ function ClozeCard(
                     <Group mb="xs">
                         {clozeSpans.length > 0 && (
                             clozeSpans.map((span, index) => (
-                                <ClozeToggle key={index} spanElement={span} label={`Cloze ${index + 1}`} back={clozeCardContent.back}/>
+                                <ClozeToggle key={index} spanElement={span} label={`Cloze ${index + 1}`} text={symmetricConcat(span.getAttribute('data-cloze'), span.textContent)} />
                             ))
                         )}
                     </Group>
