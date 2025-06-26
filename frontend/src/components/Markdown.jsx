@@ -1,4 +1,4 @@
-import { TypographyStylesProvider } from '@mantine/core';
+import { TypographyStylesProvider, useMantineColorScheme } from '@mantine/core';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -10,7 +10,6 @@ import {
     oneLight,
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import 'katex/dist/katex.min.css';
-import { useEffect, useRef } from 'react';
 
 // Function to decode HTML entities
 const decodeHtmlEntities = (text) => {
@@ -87,19 +86,19 @@ const createSanitizationSchema = () => {
 const Markdown = ({
     children,
     className = '',
-    theme = 'dark',
     allowHtml = false,
     sanitize = true, // Control sanitization
     customSanitizeSchema = null, // Allow custom schema
 }) => {
-    const syntaxTheme = theme === 'dark' ? oneDark : oneLight;
+    const { colorScheme } = useMantineColorScheme();
+    const syntaxTheme = colorScheme === 'dark' ? oneDark : oneLight;
 
     // Process content based on HTML allowance
     const processedContent = allowHtml ? children : decodeHtmlEntities(children);
 
     const inlineCodeStyles = {
-        backgroundColor: theme === 'dark' ? '#2d3748' : '#f7fafc',
-        color: theme === 'dark' ? '#e2e8f0' : '#2d3748',
+        backgroundColor: colorScheme === 'dark' ? '#2d3748' : '#f7fafc',
+        color: colorScheme === 'dark' ? '#e2e8f0' : '#2d3748',
         padding: '2px 4px',
         borderRadius: '4px',
         fontSize: '0.875em',
@@ -117,78 +116,64 @@ const Markdown = ({
     // Build rehype plugins array
     const buildRehypePlugins = () => {
         const plugins = [rehypeKatex];
-        
+
         if (allowHtml) {
             plugins.push(rehypeRaw);
-            
+
             if (sanitize) {
                 const schema = customSanitizeSchema || createSanitizationSchema();
                 plugins.push([rehypeSanitize, schema]);
             }
         }
-        
+
         return plugins;
     };
 
     return (
-            <TypographyStylesProvider className={`${className} markdown-content`}>
-                <ReactMarkdown
-                    remarkPlugins={[remarkMath]}
-                    rehypePlugins={buildRehypePlugins()}
-                    components={{
-                        pre: ({ children, ...props }) => {
-                            // Return a div instead of pre to avoid double wrapping
-                            return <div {...props}>{children}</div>;
-                        },
-                        code: ({
-                            className: codeClassName,
-                            children: codeChildren,
-                            ...props
-                        }) => {
-                            const match = /language-(\w+)/.exec(codeClassName || '');
-                            const codeString = String(codeChildren).replace(/^\n/, '').replace(/\n$/, '');
-                            return match ? (
-                                <div style={{ position: 'relative' }}>
-                        <SyntaxHighlighter
-                            style={syntaxTheme}
-                            language={match[1]}
-                            PreTag="div"
-                            customStyle={{
-                                ...syntaxHighlighterCustomStyle,
-                                paddingTop: '2.5rem', // Add space for button
-                            }}
-                            wrapLines
-                            {...props}
-                        >
-                            {codeString}
-                        </SyntaxHighlighter>
-                        <button
-                            style={{
-                                position: 'absolute',
-                                top: '0.5rem',
-                                right: '0.5rem',
-                                backgroundColor: theme === 'dark' ? '#1a202c' : '#edf2f7',
-                                color: theme === 'dark' ? '#cbd5e0' : '#2d3748',
-                                border: 'none',
-                                borderRadius: '4px',
-                                padding: '0.25rem 0.5rem',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            TODO : Does nothing for now.
-                        </button>
-                    </div>
-                            ) : (
-                                <code style={inlineCodeStyles} {...props}>
-                                    {codeChildren}
-                                </code>
-                            );
-                        },
-                    }}
-                >
-                    {processedContent}
-                </ReactMarkdown>
-            </TypographyStylesProvider>
+        <TypographyStylesProvider className={`${className} markdown-content`}
+            style={{
+                fontSize: '18px', // Base font size for all typography elements
+                lineHeight: '1.6', // Improved readability with increased line height
+            }}>
+            <ReactMarkdown
+                remarkPlugins={[remarkMath]}
+                rehypePlugins={buildRehypePlugins()}
+                components={{
+                    pre: ({ children, ...props }) => {
+                        // Return a div instead of pre to avoid double wrapping
+                        return <div {...props}>{children}</div>;
+                    },
+                    code: ({
+                        className: codeClassName,
+                        children: codeChildren,
+                        ...props
+                    }) => {
+                        const match = /language-(\w+)/.exec(codeClassName || '');
+                        const codeString = String(codeChildren).replace(/^\n/, '').replace(/\n$/, '');
+                        return match ? (
+                            <SyntaxHighlighter
+                                style={syntaxTheme}
+                                language={match[1]}
+                                PreTag="div"
+                                customStyle={{
+                                    ...syntaxHighlighterCustomStyle,
+                                }}
+                                wrapLines
+                                {...props}
+                            >
+                                {codeString}
+                            </SyntaxHighlighter>
+                        ) : (
+                            <code style={inlineCodeStyles} {...props}>
+                                {codeChildren}
+                            </code>
+                        );
+                    },
+                }}
+            >
+                {processedContent}
+            </ReactMarkdown>
+        </TypographyStylesProvider>
     );
 };
 

@@ -3,7 +3,8 @@ import Markdown from './components/Markdown';
 import BasicCard from './components/BasicCard';
 import ClozeCard from './components/ClozeCard';
 import { useEffect, useState } from 'react';
-
+import { Button } from '@mantine/core';
+import { IconCoffee } from '@tabler/icons-react';
 
 
 function App() {
@@ -16,8 +17,23 @@ function App() {
     const basicIds = ['front-card-basic', 'back-card-basic', 'extra-card-basic'];
     const clozeIds = ['front-card-cloze', 'back-card-cloze', 'extra-card-cloze'];
 
-    const [basicNodes, setBasicNodes] = useState({front: null, back: null, extra: null});
-    const [clozeNodes, setClozeNodes] = useState({front: null, back: null, extra: null});
+    const [basicNodes, setBasicNodes] = useState({ front: null, back: null, extra: null });
+    const [clozeNodes, setClozeNodes] = useState({ front: null, back: null, extra: null, contentVersion: 0 });
+
+    // State for controlling the visibility of the "Buy me a coffee" button
+    const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false);
+    const [tiggerBuyMeACoffee, setTriggerBuyMeACoffee] = useState(0);
+
+    // UseEffect to determine if the "Buy me a coffee" button should be shown
+    useEffect(() => {
+        const random = Math.random();
+        if (random <= 0.05) {
+            setShowBuyMeACoffee(true);
+        } else {
+            setShowBuyMeACoffee(false);
+        }
+    }, [tiggerBuyMeACoffee]); // Empty dependency array ensures this runs only once on mount
+
 
     // Use useEffect to check DOM once and set state
     useEffect(() => {
@@ -27,21 +43,43 @@ function App() {
         setBasicNodes({
             front: basicElements[0],
             back: basicElements[1],
-            extra: basicElements[2]
+            extra: basicElements[2],
         });
 
         setClozeNodes({
             front: clozeElements[0],
             back: clozeElements[1],
-            extra: clozeElements[2]
+            extra: clozeElements[2],
+            contentVersion: Date.now()
         });
+        setTriggerBuyMeACoffee(prev => prev + 1);
 
         const observer = new MutationObserver((mutationsList) => {
+            console.log('DOM mutation detected');
+            console.log('Mutations:', mutationsList);
             const relevantIds = [...basicIds, ...clozeIds];
-            const hasRelevantMutation = mutationsList.some(({ target, addedNodes, removedNodes }) =>
-                [target, ...addedNodes, ...removedNodes]
-                    .some(node => node?.id && relevantIds.includes(node.id))
-            );
+            const hasRelevantMutation = mutationsList.some(({ target, addedNodes, removedNodes }) => {
+                const hasRelevantAncestor = (node) => {
+                    if (!node) return false;
+
+                    let current = node;
+                    while (current) {
+                        // Check if current node has a relevant ID
+                        if (current.id && relevantIds.includes(current.id)) {
+                            return true;
+                        }
+                        // Move up to parent
+                        current = current.parentNode;
+                        // Stop at document level
+                        if (current && current.nodeType === Node.DOCUMENT_NODE) break;
+                    }
+                    return false;
+                };
+                const allNodes = [target, ...Array.from(addedNodes), ...Array.from(removedNodes)];
+                return allNodes.some(hasRelevantAncestor);
+            });
+            
+
             if (!hasRelevantMutation) return;
 
             const updatedBasicElements = basicIds.map(id => document.getElementById(id));
@@ -50,14 +88,16 @@ function App() {
             setBasicNodes({
                 front: updatedBasicElements[0],
                 back: updatedBasicElements[1],
-                extra: updatedBasicElements[2]
+                extra: updatedBasicElements[2],
             });
 
             setClozeNodes({
                 front: updatedClozeElements[0],
                 back: updatedClozeElements[1],
-                extra: updatedClozeElements[2]
+                extra: updatedClozeElements[2],
+                contentVersion: Date.now()
             });
+            setTriggerBuyMeACoffee(prev => prev + 1);
         });
 
         // Observe the entire document for changes
@@ -113,16 +153,27 @@ function App() {
      *------------------------------------------------------------------*/
     return (
         <Card shadow="sm" padding="md" radius="md" withBorder>
-            {showBasicCard && <BasicCard colors={colors} frontNode={basicNodes.front} backNode={basicNodes.back} extraNode={basicNodes.extra} />}
-            {showClozeCard && <ClozeCard colors={colors} frontNode={clozeNodes.front} backNode={clozeNodes.back} extraNode={clozeNodes.extra} />}
-
-            <Markdown allowHtml={true}>
-                {`\`\`\`python
-# Example Python code
-import os
-print("Hello World")
-\`\`\``}
-            </Markdown>
+            {showBuyMeACoffee && (
+                <Button
+                    component="a"
+                    href="https://coff.ee/alexthilleq"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    leftSection={<IconCoffee size={16} />}
+                    variant="filled"
+                    color="yellow"
+                    size="sm"
+                    radius="md"
+                    style={{
+                        marginTop: '16px',
+                        color: colorScheme === 'dark' ? 'var(--mantine-color-dark-9)' : 'var(--mantine-color-dark-9)'
+                    }}
+                >
+                    Buy me a coffee
+                </Button>
+            )}
+            {showBasicCard && <BasicCard contentVersion={basicNodes.contentVersion} colors={colors} frontNode={basicNodes.front} backNode={basicNodes.back} extraNode={basicNodes.extra} />}
+            {showClozeCard && <ClozeCard contentVersion={clozeNodes.contentVersion} colors={colors} frontNode={clozeNodes.front} backNode={clozeNodes.back} extraNode={clozeNodes.extra} />}
         </Card>
     );
 }

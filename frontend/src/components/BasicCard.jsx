@@ -34,7 +34,7 @@ function BasicCard({
             <Stack gap="md">
                 {/* Front section */}
                 <div>
-                    <Text fw={600} size="sm" mb="xs" c="dimmed">
+                    <Text fw={600} size="md" mb="xs" c="dimmed">
                         FRONT
                     </Text>
                     <Paper
@@ -49,7 +49,7 @@ function BasicCard({
 
                 {/* Back section */}
                 {basicCardContent.back && (<div>
-                    <Text fw={600} size="sm" mb="xs" c="dimmed">
+                    <Text fw={600} size="md" mb="xs" c="dimmed">
                         BACK
                     </Text>
                     <Paper
@@ -64,7 +64,7 @@ function BasicCard({
 
                 {/* Extra section (fixed the typo: was "FRONT", now "EXTRA") */}
                 {basicCardContent.extra && (<div>
-                    <Text fw={600} size="sm" mb="xs" c="dimmed">
+                    <Text fw={600} size="md" mb="xs" c="dimmed">
                         EXTRA
                     </Text>
                     <Paper
