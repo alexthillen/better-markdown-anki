@@ -21,7 +21,7 @@
     color: inherit !important;
 }
 
-#qa {
+#qa:empty {
     display: none;
 }
 

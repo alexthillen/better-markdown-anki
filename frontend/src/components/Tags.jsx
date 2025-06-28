@@ -8,7 +8,7 @@ export function Tags({ tags }) {
       {tags && tags.length > 0 && (
         <Group mb="sm">
           {tags.map((tag, index) => (
-            <Badge key={index} variant="light" color="gray" size="sm">
+            <Badge key={index} variant="light" color="gray" size="lg">
               {tag}
             </Badge>
           ))}
@@ -23,7 +23,7 @@ export function DifficultyBadge({ difficulty }) {
     <>
         <Group mb="sm">
       {difficulty && (
-          <Badge variant="light" color="orange" size="sm">
+          <Badge variant="light" color="orange" size="lg">
             {difficulty}
           </Badge>
       )}

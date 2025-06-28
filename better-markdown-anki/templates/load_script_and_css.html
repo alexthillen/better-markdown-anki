@@ -1,0 +1,43 @@
+<script>
+    (function() {
+        var jsLocal = '_anki-flashcard.js';
+        var jsCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/dist/assets/_anki-flashcard.js';
+        var cssLocal = '_anki-flashcard.css';
+        var cssCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/dist/assets/_anki-flashcard.css';
+
+        // Load CSS
+        function loadCSS(href, fallback) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.onerror = function() {
+                if (fallback) {
+                    var fallbackLink = document.createElement('link');
+                    fallbackLink.rel = 'stylesheet';
+                    fallbackLink.href = fallback;
+                    document.head.appendChild(fallbackLink);
+                }
+            };
+            document.head.appendChild(link);
+        }
+
+        // Load JS
+        function loadJS(src, fallback) {
+            if (!document.querySelector('script[src="' + src + '"]')) {
+                var script = document.createElement('script');
+                script.src = src;
+                script.onerror = function() {
+                    if (fallback && !document.querySelector('script[src="' + fallback + '"]')) {
+                        var fallbackScript = document.createElement('script');
+                        fallbackScript.src = fallback;
+                        document.head.appendChild(fallbackScript);
+                    }
+                };
+                document.head.appendChild(script);
+            }
+        }
+
+        loadCSS(cssLocal, cssCDN);
+        loadJS(jsLocal, jsCDN);
+    })();
+</script>
