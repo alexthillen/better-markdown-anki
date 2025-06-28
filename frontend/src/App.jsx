@@ -46,7 +46,6 @@ function App() {
         }
     }, [tiggerBuyMeACoffee]); // Empty dependency array ensures this runs only once on mount
 
-    console.log('Basic Elements:');
     // Use useEffect to check DOM once and set state
     useEffect(() => {
         const basicElements = basicIds.map(id => document.getElementById(id));
@@ -69,14 +68,10 @@ function App() {
         });
         setTags(stringToTags(tagElement ? tagElement.innerText : ''));
         setDifficulty(difficultyElement ? difficultyElement.innerText.trim() : null);
-        console.log('Tags:', tagElement, stringToTags(tagElement ? tagElement.innerText : ''));
-        console.log('Difficulty:', difficultyElement ? difficultyElement.innerText.trim() : null);
 
         setTriggerBuyMeACoffee(prev => prev + 1);
 
         const observer = new MutationObserver((mutationsList) => {
-            console.log('DOM mutation detected');
-            console.log('Mutations:', mutationsList);
             const relevantIds = [...basicIds, ...clozeIds];
             const hasRelevantMutation = mutationsList.some(({ target, addedNodes, removedNodes }) => {
                 const hasRelevantAncestor = (node) => {

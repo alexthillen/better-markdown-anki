@@ -1,9 +1,9 @@
 <script>
     (function() {
-        var jsLocal = '_anki-flashcard.js';
-        var jsCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/dist/assets/_anki-flashcard.js';
-        var cssLocal = '_anki-flashcard.css';
-        var cssCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/dist/assets/_anki-flashcard.css';
+        var jsLocal = '_better_markdown_anki.js';
+        var jsCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/dist/_better_markdown_anki.js';
+        var cssLocal = '_better_markdown_anki.css';
+        var cssCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/dist/_better_markdown_anki.css';
 
         // Load CSS
         function loadCSS(href, fallback) {
@@ -21,14 +21,17 @@
             document.head.appendChild(link);
         }
 
-        // Load JS
+        // Load JS as ES Module
         function loadJS(src, fallback) {
-            if (!document.querySelector('script[src="' + src + '"]')) {
+            var scriptSelector = 'script[src="' + src + '"]';
+            if (!document.querySelector(scriptSelector)) {
                 var script = document.createElement('script');
+                script.type = 'module'; // Essential for ES modules
                 script.src = src;
                 script.onerror = function() {
                     if (fallback && !document.querySelector('script[src="' + fallback + '"]')) {
                         var fallbackScript = document.createElement('script');
+                        fallbackScript.type = 'module';
                         fallbackScript.src = fallback;
                         document.head.appendChild(fallbackScript);
                     }

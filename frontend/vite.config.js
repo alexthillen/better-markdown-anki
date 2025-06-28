@@ -7,30 +7,49 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Rename the main JS entry file
         entryFileNames: '_better_markdown_anki.js',
+        chunkFileNames: '_better_markdown_anki_chunk_[name]-[hash].js',
         
-        // Keep existing chunk naming for code splitting
-        chunkFileNames: 'assets/[name]-[hash].js',
-        
-        // Updated assetFileNames using the new API
         assetFileNames: (assetInfo) => {
-          // Get the first name from the names array (fallback for compatibility)
-          const fileName = assetInfo.names?.[0] || 'unknown';
-          
-          // Check if the asset is a CSS file
+          const fileName = assetInfo.names?.[0] || assetInfo.name || 'unknown';
           if (/\.css$/.test(fileName)) {
             return '_better_markdown_anki.css';
           }
-          
-          // Check if the asset is a common font type
           if (/\.(ttf|woff|woff2|eot|otf)$/.test(fileName)) {
-            return `assets/fonts/[name]-[hash][extname]`;
+            return `_better_markdown_anki_[name]-[hash][extname]`;
           }
-          
-          // Default behavior for other assets
-          return `assets/[name]-[hash][extname]`;
+          return `_better_markdown_anki_[name]-[hash][extname]`;
         },
+        
+        // Simpler, safer chunking
+        manualChunks: {
+          // Keep React ecosystem together to avoid dependency issues
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          
+          // UI libraries (less likely to have circular deps)
+          'ui-libs': [
+            '@mantine/core',
+            '@mantine/hooks',
+            '@mantine/form',
+            '@mantine/code-highlight',
+            '@mantine/dates',
+            '@mantine/dropzone',
+            '@mantine/notifications'
+          ],
+          
+          // Content processing
+          'content-libs': [
+            'react-markdown',
+            'remark-math',
+            'rehype-katex',
+            'rehype-raw',
+            'rehype-sanitize',
+            'react-syntax-highlighter'
+          ],
+          
+          // Icons and visual assets
+          'visual-libs': ['@tabler/icons-react', 'react-icons']
+        }
       },
     },
   },

@@ -106,13 +106,11 @@ function ClozeCard(
     };
     const root = document.getElementById('front-card-cloze');
     const clozeSpans = Array.from(root ? root.querySelectorAll('span.cloze') : []);
-    // console.log('Cloze spans found:', clozeSpans.length, clozeSpans);
 
     const nodeToMarkdown = (node: HTMLElement | null): string => {
         if (!node) return '';
         const res = replaceCodeBlockContent(node.innerHTML.trim() || '');
         const mathRes = replaceMarkdownMathContent(res);
-        console.log('nodeToMarkdown', mathRes);
         return mathRes;
     }
 
@@ -121,9 +119,7 @@ function ClozeCard(
     }
 
     useEffect(() => {
-        console.log('ClozeCard useEffect triggered');
         if (clozeCardContent.back !== nodeToMarkdown(backNode)) {
-            console.log('ClozeCard back content changed, resetting toggles');
             setResetToggle(prev => prev + 1); // Increment to reset toggles
         }
 
