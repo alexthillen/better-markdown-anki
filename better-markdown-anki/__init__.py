@@ -1,19 +1,9 @@
-import json
 import os
 from aqt import mw
 from anki.models import ModelManager
 from anki.lang import _
 from anki.collection import Collection
 from .utils import add_folder_to_media, patch_variables_in_file
-import sys
-
-
-log_file_path = os.path.join(".", "better_markdown_anki.log")
-sys.stdout = open(log_file_path, "a")
-sys.stderr = sys.stdout
-
-
-print(f"Loaded from: {os.path.abspath(__file__)}")
 
 
 ################################ CONFIGURATION #####################################################
