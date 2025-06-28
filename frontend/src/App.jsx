@@ -1,10 +1,10 @@
-import { Card, Paper, Stack, Text, useMantineColorScheme } from '@mantine/core';
-import Markdown from './components/Markdown';
+import { Badge, Card, Group, useMantineColorScheme } from '@mantine/core';
 import BasicCard from './components/BasicCard';
 import ClozeCard from './components/ClozeCard';
 import { useEffect, useState } from 'react';
 import { Button } from '@mantine/core';
-import { IconCoffee } from '@tabler/icons-react';
+import IconCoffee from '@tabler/icons-react/dist/esm/icons/IconCoffee.mjs';
+import { TagsAndDifficulty } from './components/Tags';
 
 
 function App() {
@@ -16,9 +16,21 @@ function App() {
 
     const basicIds = ['front-card-basic', 'back-card-basic', 'extra-card-basic'];
     const clozeIds = ['front-card-cloze', 'back-card-cloze', 'extra-card-cloze'];
+    const tagsIds = ['tags-card', 'tags-card-basic', 'tags-card-cloze'];
+    const difficultyIds = ['difficulty-card', 'difficulty-card-basic', 'difficulty-card-cloze'];
 
     const [basicNodes, setBasicNodes] = useState({ front: null, back: null, extra: null });
     const [clozeNodes, setClozeNodes] = useState({ front: null, back: null, extra: null, contentVersion: 0 });
+    const [tags, setTags] = useState([]);
+    const [difficulty, setDifficulty] = useState(null);
+
+    const stringToTags = (str) => {
+        if (!str) return [];
+        return str
+            .trim()
+            .split(/\s+/)
+            .filter((tag) => tag.length > 0);
+    };
 
     // State for controlling the visibility of the "Buy me a coffee" button
     const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false);
@@ -27,18 +39,21 @@ function App() {
     // UseEffect to determine if the "Buy me a coffee" button should be shown
     useEffect(() => {
         const random = Math.random();
-        if (random <= 0.05) {
+        if (random <= 0.03) {
             setShowBuyMeACoffee(true);
         } else {
             setShowBuyMeACoffee(false);
         }
     }, [tiggerBuyMeACoffee]); // Empty dependency array ensures this runs only once on mount
 
-
+    console.log('Basic Elements:');
     // Use useEffect to check DOM once and set state
     useEffect(() => {
         const basicElements = basicIds.map(id => document.getElementById(id));
         const clozeElements = clozeIds.map(id => document.getElementById(id));
+        const tagElement = tagsIds.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
+        const difficultyElement = difficultyIds.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
+
 
         setBasicNodes({
             front: basicElements[0],
@@ -52,6 +67,11 @@ function App() {
             extra: clozeElements[2],
             contentVersion: Date.now()
         });
+        setTags(stringToTags(tagElement ? tagElement.innerText : ''));
+        setDifficulty(difficultyElement ? difficultyElement.innerText.trim() : null);
+        console.log('Tags:', tagElement, stringToTags(tagElement ? tagElement.innerText : ''));
+        console.log('Difficulty:', difficultyElement ? difficultyElement.innerText.trim() : null);
+
         setTriggerBuyMeACoffee(prev => prev + 1);
 
         const observer = new MutationObserver((mutationsList) => {
@@ -78,12 +98,14 @@ function App() {
                 const allNodes = [target, ...Array.from(addedNodes), ...Array.from(removedNodes)];
                 return allNodes.some(hasRelevantAncestor);
             });
-            
+
 
             if (!hasRelevantMutation) return;
 
             const updatedBasicElements = basicIds.map(id => document.getElementById(id));
             const updatedClozeElements = clozeIds.map(id => document.getElementById(id));
+            const updatedTagsElement = tagsIds.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
+            const updatedDifficultyElement = difficultyIds.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
 
             setBasicNodes({
                 front: updatedBasicElements[0],
@@ -97,6 +119,8 @@ function App() {
                 extra: updatedClozeElements[2],
                 contentVersion: Date.now()
             });
+            setTags(stringToTags(updatedTagsElement ? updatedTagsElement.innerText : ''));
+            setDifficulty(updatedDifficultyElement ? updatedDifficultyElement.innerText.trim() : null);
             setTriggerBuyMeACoffee(prev => prev + 1);
         });
 
@@ -153,6 +177,12 @@ function App() {
      *------------------------------------------------------------------*/
     return (
         <Card shadow="sm" padding="md" radius="md" withBorder>
+
+            <TagsAndDifficulty tags={tags} difficulty={difficulty} />
+            {showBasicCard && <BasicCard contentVersion={basicNodes.contentVersion} colors={colors} frontNode={basicNodes.front} backNode={basicNodes.back} extraNode={basicNodes.extra} />}
+            {showClozeCard && <ClozeCard contentVersion={clozeNodes.contentVersion} colors={colors} frontNode={clozeNodes.front} backNode={clozeNodes.back} extraNode={clozeNodes.extra} />}
+
+
             {showBuyMeACoffee && (
                 <Button
                     component="a"
@@ -172,8 +202,7 @@ function App() {
                     Buy me a coffee
                 </Button>
             )}
-            {showBasicCard && <BasicCard contentVersion={basicNodes.contentVersion} colors={colors} frontNode={basicNodes.front} backNode={basicNodes.back} extraNode={basicNodes.extra} />}
-            {showClozeCard && <ClozeCard contentVersion={clozeNodes.contentVersion} colors={colors} frontNode={clozeNodes.front} backNode={clozeNodes.back} extraNode={clozeNodes.extra} />}
+
         </Card>
     );
 }

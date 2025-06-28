@@ -138,7 +138,7 @@ function ClozeCard(
             <Stack gap="md">
                 {/* Front section */}
                 {clozeCardContent.front && (<div>
-                    <Text fw={600} size="sm" mb="xs" c="dimmed">
+                    <Text fw={600} size="lg" mb="xs" c="dimmed">
                         FRONT
                     </Text>
                     <Group mb="xs">
@@ -160,7 +160,7 @@ function ClozeCard(
 
                 {/* Back section */}
                 {clozeCardContent.back && (<div>
-                    <Text fw={600} size="sm" mb="xs" c="dimmed">
+                    <Text fw={600} size="lg" mb="xs" c="dimmed">
                         BACK
                     </Text>
                     <Paper
@@ -175,7 +175,7 @@ function ClozeCard(
 
                 {/* Extra section (fixed the typo: was "FRONT", now "EXTRA") */}
                 {clozeCardContent.extra && (<div>
-                    <Text fw={600} size="sm" mb="xs" c="dimmed">
+                    <Text fw={600} size="lg" mb="xs" c="dimmed">
                         EXTRA
                     </Text>
                     <Paper
