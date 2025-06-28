@@ -20,7 +20,7 @@ document.body.appendChild(newRoot)
 const nightModeElement = document.querySelector('.nightMode') || document.querySelector('.night-mode');
 
 
-const defaultScheme = nightModeElement ? 'dark' : 'dark';
+const defaultScheme = nightModeElement ? 'dark' : 'light';
 
 createRoot(document.getElementById('root-react')).render(
   <StrictMode>
