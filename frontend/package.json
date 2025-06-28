@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && python ../deploy.py",
+    "build": "vite build && rm dist/index.html && rm -rf ../better-markdown-anki/dist && mv -f dist ../better-markdown-anki/dist",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -43,7 +43,7 @@ function BasicCard({
                         style={getBorderStyle(colors.front.border)}
                         radius="sm"
                     >
-                        <Markdown>{basicCardContent.front}</Markdown>
+                        <Markdown allowHtml={true}>{basicCardContent.front}</Markdown>
                     </Paper>
                 </div>
 
@@ -58,7 +58,7 @@ function BasicCard({
                         style={getBorderStyle(colors.back.border)}
                         radius="sm"
                     >
-                        <Markdown>{basicCardContent.back}</Markdown>
+                        <Markdown allowHtml={true}>{basicCardContent.back}</Markdown>
                     </Paper>
                 </div>)}
 
@@ -73,7 +73,7 @@ function BasicCard({
                         style={getBorderStyle(colors.extra.border)}
                         radius="sm"
                     >
-                        <Markdown>{basicCardContent.extra}</Markdown>
+                        <Markdown allowHtml={true}>{basicCardContent.extra}</Markdown>
                     </Paper>
                 </div>)}
             </Stack>

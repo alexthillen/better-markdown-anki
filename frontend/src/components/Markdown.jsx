@@ -132,8 +132,8 @@ const Markdown = ({
     return (
         <TypographyStylesProvider className={`${className} markdown-content`}
             style={{
-                fontSize: '18px', // Base font size for all typography elements
-                lineHeight: '1.6', // Improved readability with increased line height
+                fontSize: '24px',
+                lineHeight: '1.4',
             }}>
             <ReactMarkdown
                 remarkPlugins={[remarkMath]}

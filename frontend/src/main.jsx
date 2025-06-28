@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { createTheme, MantineProvider } from '@mantine/core'
+import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
@@ -19,17 +19,14 @@ document.body.appendChild(newRoot)
 // check if there is an element with class "nightMode" or "night-mode" in the document
 const nightModeElement = document.querySelector('.nightMode') || document.querySelector('.night-mode');
 
-const theme = createTheme({
-    colorScheme: nightModeElement ? 'dark' : 'light',
-})
 
-
+const defaultScheme = nightModeElement ? 'dark' : 'dark';
 
 createRoot(document.getElementById('root-react')).render(
   <StrictMode>
         <MantineProvider 
         withGlobalClasses
-        theme={theme}
+        defaultColorScheme={defaultScheme}
       ><App /></MantineProvider>
   </StrictMode>,
 )

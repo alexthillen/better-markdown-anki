@@ -21,6 +21,14 @@
     color: inherit !important;
 }
 
-#qa {
+#qa:empty {
     display: none;
+}
+
+#tags-card, #tags-card-basic, #tags-card-cloze {
+    display: none !important;
+}
+
+#difficulty-card, #difficulty-card-basic, #difficulty-card-cloze {
+    display: none !important;
 }
