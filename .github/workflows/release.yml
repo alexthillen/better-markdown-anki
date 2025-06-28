@@ -1,0 +1,55 @@
+name: Build and Deploy Anki Add-on
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      # Step 2: Extract version from release tag
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          # Get the tag name from GITHUB_REF (e.g., refs/tags/v1.0.0)
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Extracted version: ${VERSION}"
+      
+      # Step 3: Replace TAG in __init__.py
+      - name: Update version tag in __init__.py
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: 'TAG = "DEV_TAG"'
+          replace: 'TAG = "${{ steps.extract_version.outputs.version }}"'
+          include: "better-markdown-anki/__init__.py"
+          regex: false
+      
+      # Step 4: Create add-on package
+      - name: Create add-on package
+        run: |
+          # Create a zip file of the add-on directory
+          cd better-markdown-anki
+          zip -r ../better-markdown-anki-${{ steps.extract_version.outputs.version }}.ankiaddon *
+          cd ..
+          # Verify the package was created
+          ls -la *.ankiaddon
+      
+      # Step 5: Upload package as release asset
+      - name: Upload add-on package to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./better-markdown-anki-${{ steps.extract_version.outputs.version }}.ankiaddon
+          asset_name: better-markdown-anki-${{ steps.extract_version.outputs.version }}.ankiaddon
+          asset_content_type: application/zip
