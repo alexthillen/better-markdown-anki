@@ -21,7 +21,7 @@ function removeClozeSpans(htmlString) {
     return res;
 }
 
-function replaceCodeBlockContent(markdownText) {
+function replaceCodeContent(markdownText) {
     const codeBlockRegex = /\`\`\`(\w+)([\s\S]*?)\`\`\`/g;
 
     let res = markdownText.replace(codeBlockRegex, (match, language, content) => {
@@ -30,6 +30,13 @@ function replaceCodeBlockContent(markdownText) {
         return `\n\`\`\`${language}${processedContent}\`\`\``;
     });
 
+    const inlineCodeRegex = /`([^`\n]+)`/g;
+    res = res.replace(inlineCodeRegex, (match, content) => {
+        let processedContent = content.replace(/<br\s*\/?>/gi, '\n');
+        processedContent = removeClozeSpans(processedContent);
+        return `\`${processedContent}\``;
+    });
+    
     return res;
 }
 
@@ -109,7 +116,7 @@ function ClozeCard(
 
     const nodeToMarkdown = (node: HTMLElement | null): string => {
         if (!node) return '';
-        const res = replaceCodeBlockContent(node.innerHTML.trim() || '');
+        const res = replaceCodeContent(node.innerHTML.trim() || '');
         const mathRes = replaceMarkdownMathContent(res);
         return mathRes;
     }
