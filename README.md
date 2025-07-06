@@ -4,7 +4,9 @@ A powerful React-based Anki add-on that transforms your flashcards with advanced
 
 ## Preview
 
-![Better Markdown Anki Preview](https://raw.githubusercontent.com/alexthillen/better-markdown-anki/refs/heads/main/.github/assets/better-markdown-anki-example.gif)
+![Better Markdown Anki Review](https://raw.githubusercontent.com/alexthillen/better-markdown-anki/refs/heads/main/.github/assets/better-markdown-anki-example.gif)
+
+![Better Markdown Anki Preview](https://raw.githubusercontent.com/alexthillen/better-markdown-anki/refs/heads/main/.github/assets/better-markdown-anki-preview.png)
 
 ## Features
 
