@@ -7,7 +7,7 @@ import { Card, Paper, Stack, Text } from '@mantine/core';
 
 
 function BasicCard({
-    frontNode, backNode, extraNode,
+    frontNode, backNode, extraNode, contentVersion,
     colors
 }) {
     const [basicCardContent, setBasicCardContent] = useState({
@@ -27,7 +27,7 @@ function BasicCard({
             back:  backNode?.innerHTML.trim() || '',
             extra: extraNode?.innerHTML.trim() || ''
         });
-    }, [frontNode, backNode, extraNode]);
+    }, [frontNode, backNode, extraNode, contentVersion]);
 
     return (
         <div>

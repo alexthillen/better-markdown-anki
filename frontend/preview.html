@@ -1,0 +1,919 @@
+<html class="" dir="ltr" data-bs-theme="light" data-mantine-color-scheme="light"
+    style="--editor-shrink-max-width:250px; --editor-shrink-max-height:125px; --editor-default-max-width:250px; --editor-default-max-height:125px;">
+
+<head>
+    <title>editor</title>
+    <link rel="stylesheet" type="text/css" href="http://127.0.0.1:64491/_anki/css/editor.css">
+    <style type="text/css">
+        .CtxtMenu_InfoClose {
+            top: .2em;
+            right: .2em;
+        }
+
+        .CtxtMenu_InfoContent {
+            overflow: auto;
+            text-align: left;
+            font-size: 80%;
+            padding: .4em .6em;
+            border: 1px inset;
+            margin: 1em 0px;
+            max-height: 20em;
+            max-width: 30em;
+            background-color: #EEEEEE;
+            white-space: normal;
+        }
+
+        .CtxtMenu_Info.CtxtMenu_MousePost {
+            outline: none;
+        }
+
+        .CtxtMenu_Info {
+            position: fixed;
+            left: 50%;
+            width: auto;
+            text-align: center;
+            border: 3px outset;
+            padding: 1em 2em;
+            background-color: #DDDDDD;
+            color: black;
+            cursor: default;
+            font-family: message-box;
+            font-size: 120%;
+            font-style: normal;
+            text-indent: 0;
+            text-transform: none;
+            line-height: normal;
+            letter-spacing: normal;
+            word-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            float: none;
+            z-index: 201;
+            border-radius: 15px;
+            /* Opera 10.5 and IE9 */
+            -webkit-border-radius: 15px;
+            /* Safari and Chrome */
+            -moz-border-radius: 15px;
+            /* Firefox */
+            -khtml-border-radius: 15px;
+            /* Konqueror */
+            box-shadow: 0px 10px 20px #808080;
+            /* Opera 10.5 and IE9 */
+            -webkit-box-shadow: 0px 10px 20px #808080;
+            /* Safari 3 & Chrome */
+            -moz-box-shadow: 0px 10px 20px #808080;
+            /* Forefox 3.5 */
+            -khtml-box-shadow: 0px 10px 20px #808080;
+            /* Konqueror */
+            filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color="gray", Positive="true");
+            /* IE */
+        }
+    </style>
+    <style type="text/css">
+        .CtxtMenu_MenuClose {
+            position: absolute;
+            cursor: pointer;
+            display: inline-block;
+            border: 2px solid #AAA;
+            border-radius: 18px;
+            -webkit-border-radius: 18px;
+            /* Safari and Chrome */
+            -moz-border-radius: 18px;
+            /* Firefox */
+            -khtml-border-radius: 18px;
+            /* Konqueror */
+            font-family: "Courier New", Courier;
+            font-size: 24px;
+            color: #F0F0F0
+        }
+
+        .CtxtMenu_MenuClose span {
+            display: block;
+            background-color: #AAA;
+            border: 1.5px solid;
+            border-radius: 18px;
+            -webkit-border-radius: 18px;
+            /* Safari and Chrome */
+            -moz-border-radius: 18px;
+            /* Firefox */
+            -khtml-border-radius: 18px;
+            /* Konqueror */
+            line-height: 0;
+            padding: 8px 0 6px
+                /* may need to be browser-specific */
+        }
+
+        .CtxtMenu_MenuClose:hover {
+            color: white !important;
+            border: 2px solid #CCC !important
+        }
+
+        .CtxtMenu_MenuClose:hover span {
+            background-color: #CCC !important
+        }
+
+        .CtxtMenu_MenuClose:hover:focus {
+            outline: none
+        }
+    </style>
+    <style type="text/css">
+        .CtxtMenu_Menu {
+            position: absolute;
+            background-color: white;
+            color: black;
+            width: auto;
+            padding: 5px 0px;
+            border: 1px solid #CCCCCC;
+            margin: 0;
+            cursor: default;
+            font: menu;
+            text-align: left;
+            text-indent: 0;
+            text-transform: none;
+            line-height: normal;
+            letter-spacing: normal;
+            word-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            float: none;
+            z-index: 201;
+            border-radius: 5px;
+            /* Opera 10.5 and IE9 */
+            -webkit-border-radius: 5px;
+            /* Safari and Chrome */
+            -moz-border-radius: 5px;
+            /* Firefox */
+            -khtml-border-radius: 5px;
+            /* Konqueror */
+            box-shadow: 0px 10px 20px #808080;
+            /* Opera 10.5 and IE9 */
+            -webkit-box-shadow: 0px 10px 20px #808080;
+            /* Safari 3 & Chrome */
+            -moz-box-shadow: 0px 10px 20px #808080;
+            /* Forefox 3.5 */
+            -khtml-box-shadow: 0px 10px 20px #808080;
+            /* Konqueror */
+        }
+
+        .CtxtMenu_MenuItem {
+            padding: 1px 2em;
+            background: transparent;
+        }
+
+        .CtxtMenu_MenuArrow {
+            position: absolute;
+            right: .5em;
+            padding-top: .25em;
+            color: #666666;
+            font-family: null;
+            font-size: .75em
+        }
+
+        .CtxtMenu_MenuActive .CtxtMenu_MenuArrow {
+            color: white
+        }
+
+        .CtxtMenu_MenuArrow.CtxtMenu_RTL {
+            left: .5em;
+            right: auto
+        }
+
+        .CtxtMenu_MenuCheck {
+            position: absolute;
+            left: .7em;
+            font-family: null
+        }
+
+        .CtxtMenu_MenuCheck.CtxtMenu_RTL {
+            right: .7em;
+            left: auto
+        }
+
+        .CtxtMenu_MenuRadioCheck {
+            position: absolute;
+            left: .7em;
+        }
+
+        .CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {
+            right: .7em;
+            left: auto
+        }
+
+        .CtxtMenu_MenuInputBox {
+            padding-left: 1em;
+            right: .5em;
+            color: #666666;
+            font-family: null;
+        }
+
+        .CtxtMenu_MenuInputBox.CtxtMenu_RTL {
+            left: .1em;
+        }
+
+        .CtxtMenu_MenuComboBox {
+            left: .1em;
+            padding-bottom: .5em;
+        }
+
+        .CtxtMenu_MenuSlider {
+            left: .1em;
+        }
+
+        .CtxtMenu_SliderValue {
+            position: absolute;
+            right: .1em;
+            padding-top: .25em;
+            color: #333333;
+            font-size: .75em
+        }
+
+        .CtxtMenu_SliderBar {
+            outline: none;
+            background: #d3d3d3
+        }
+
+        .CtxtMenu_MenuLabel {
+            padding: 1px 2em 3px 1.33em;
+            font-style: italic
+        }
+
+        .CtxtMenu_MenuRule {
+            border-top: 1px solid #DDDDDD;
+            margin: 4px 3px;
+        }
+
+        .CtxtMenu_MenuDisabled {
+            color: GrayText
+        }
+
+        .CtxtMenu_MenuActive {
+            background-color: #606872;
+            color: white;
+        }
+
+        .CtxtMenu_MenuDisabled:focus {
+            background-color: #E8E8E8
+        }
+
+        .CtxtMenu_MenuLabel:focus {
+            background-color: #E8E8E8
+        }
+
+        .CtxtMenu_ContextMenu:focus {
+            outline: none
+        }
+
+        .CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {
+            outline: none
+        }
+
+        .CtxtMenu_SelectionMenu {
+            position: relative;
+            float: left;
+            border-bottom: none;
+            -webkit-box-shadow: none;
+            -webkit-border-radius: 0px;
+        }
+
+        .CtxtMenu_SelectionItem {
+            padding-right: 1em;
+        }
+
+        .CtxtMenu_Selection {
+            right: 40%;
+            width: 50%;
+        }
+
+        .CtxtMenu_SelectionBox {
+            padding: 0em;
+            max-height: 20em;
+            max-width: none;
+            background-color: #FFFFFF;
+        }
+
+        .CtxtMenu_SelectionDivider {
+            clear: both;
+            border-top: 2px solid #000000;
+        }
+
+        .CtxtMenu_Menu .CtxtMenu_MenuClose {
+            top: -10px;
+            left: -10px
+        }
+    </style>
+    <script type="module" src="/src/main.jsx"></script>
+</head>
+
+<body class="isMac reduce-motion fancy">
+    <!-- <script src="http://127.0.0.1:64491/_anki/js/webview.js"></script>
+    <script src="http://127.0.0.1:64491/_anki/js/mathjax.js"></script>
+    <script src="http://127.0.0.1:64491/_anki/js/editor.js"></script> -->
+
+    <div class="note-editor svelte-voa1vl">
+        <div class="editor-toolbar svelte-1jmvn33">
+            <div role="toolbar" class="button-toolbar btn-toolbar  svelte-p4w4bt"
+                style="--buttons-size: 1.6rem; --buttons-wrap: wrap; --icon-align:baseline;">
+                <div class="dynamically-slottable svelte-8in7my"><!---->
+                    <div class="item svelte-u5rx4p" id="notetype"><!---->
+                        <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                            <div class="dynamically-slottable svelte-8in7my"><!---->
+                                <div class="button-group-item svelte-1wfg5gy"
+                                    style="--border-left-radius: 5px; --border-right-radius: 0; "><!----><button
+                                        class="label-button  svelte-gv0fwz" title="Customize Fields"
+                                        tabindex="-1">Fields...<!----></button><!----></div><!---->
+                                <div class="button-group-item svelte-1wfg5gy"
+                                    style="--border-left-radius: 0; --border-right-radius: 5px; "><!----><!----><button
+                                        class="label-button  svelte-gv0fwz" title="Customize Card Templates (⌘L)"
+                                        tabindex="-1">Cards...<!----></button><!----> <!----><!----></div><!---->
+                                <!----><!----><!----><!----> <!---->
+                            </div><!---->
+                        </div><!---->
+                    </div><!---->
+                    <div class="item svelte-u5rx4p" id="settings"><!---->
+                        <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                            <div class="dynamically-slottable svelte-8in7my">
+                                <div class="button-group-item svelte-1wfg5gy" id="options"
+                                    style="--border-left-radius: 5px; --border-right-radius: 5px; ">
+                                    <!----><!----><!----> <!----><span
+                                        class="floating-reference svelte-1rg7qgv"><svelte-css-wrapper
+                                            style="display: contents; --border-left-radius:5px; --border-right-radius:5px; --padding-inline:8px;"><button
+                                                class="icon-button  svelte-1p77nr8" title="Options" tabindex="-1"><span
+                                                    class="svelte-111fj0e"
+                                                    style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><svg
+                                                        xmlns="http://www.w3.org/2000/svg" id="mdi-cog"
+                                                        viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z">
+                                                        </path>
+                                                    </svg><!----></span><!----></button><!----></svelte-css-wrapper><!----></span><!---->
+                                    <!----><!---->
+                                    <div class="floating svelte-1rg7qgv"><!---->
+                                        <div class="floating-arrow svelte-1rg7qgv" hidden="">
+                                            <div class="arrow svelte-137gj59"></div><!---->
+                                        </div>
+                                    </div><!----><!---->
+                                </div><!----> <!---->
+                            </div><!---->
+                        </div><!---->
+                    </div><!---->
+                    <div class="item svelte-u5rx4p" id="inlineFormatting"><!---->
+                        <div class="dynamically-slottable svelte-8in7my"><!---->
+                            <div class="item svelte-u5rx4p"><!---->
+                                <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                                    <svelte-css-wrapper
+                                        style="display: contents; --border-left-radius:5px;"><!----><!----><button
+                                            class="icon-button  svelte-1p77nr8" title="Bold text (⌘B)" tabindex="-1"
+                                            disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-type-bold" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 0 0 1.852-2.14c0-1.51-1.162-2.46-3.014-2.46H3.843V13zM5.908 4.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908V4.673zm0 6.788V8.598h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907z">
+                                                    </path>
+                                                </svg><!----></span><!----></button><!---->
+                                        <!----><!----></svelte-css-wrapper> <!----><!----><button
+                                        class="icon-button  svelte-1p77nr8" title="Italic text (⌘I)" tabindex="-1"
+                                        disabled=""><span class="svelte-111fj0e"
+                                            style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-type-italic" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M7.991 11.674 9.53 4.455c.123-.595.246-.71 1.347-.807l.11-.52H7.211l-.11.52c1.06.096 1.128.212 1.005.807L6.57 11.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z">
+                                                </path>
+                                            </svg><!----></span><!----></button><!----> <!----><!---->
+                                    <svelte-css-wrapper
+                                        style="display: contents; --border-right-radius:5px;"><!----><!----><button
+                                            class="icon-button  svelte-1p77nr8" title="Underline text (⌘U)"
+                                            tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-type-underline"
+                                                    viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M5.313 3.136h-1.23V9.54c0 2.105 1.47 3.623 3.917 3.623s3.917-1.518 3.917-3.623V3.136h-1.23v6.323c0 1.49-.978 2.57-2.687 2.57s-2.687-1.08-2.687-2.57zM12.5 15h-9v-1h9z">
+                                                    </path>
+                                                </svg><!----></span><!----></button><!---->
+                                        <!----><!----></svelte-css-wrapper><!----></div><!---->
+                            </div><!---->
+                            <div class="item svelte-u5rx4p"><!---->
+                                <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                                    <svelte-css-wrapper
+                                        style="display: contents; --border-left-radius:5px;"><!----><!----><button
+                                            class="icon-button  svelte-1p77nr8" title="Superscript (⌘=)" tabindex="-1"
+                                            disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" id="mdi-format-superscript"
+                                                    viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M16,7.41L11.41,12L16,16.59L14.59,18L10,13.41L5.41,18L4,16.59L8.59,12L4,7.41L5.41,6L10,10.59L14.59,6L16,7.41M21.85,9H16.97V8L17.86,7.18C18.62,6.54 19.18,6 19.56,5.55C19.93,5.11 20.12,4.7 20.13,4.32C20.14,4.04 20.05,3.8 19.86,3.62C19.68,3.43 19.39,3.34 19,3.33C18.69,3.34 18.42,3.4 18.16,3.5L17.5,3.89L17.05,2.72C17.32,2.5 17.64,2.33 18.03,2.19C18.42,2.05 18.85,2 19.32,2C20.1,2 20.7,2.2 21.1,2.61C21.5,3 21.72,3.54 21.72,4.18C21.71,4.74 21.53,5.26 21.18,5.73C20.84,6.21 20.42,6.66 19.91,7.09L19.27,7.61V7.63H21.85V9Z">
+                                                    </path>
+                                                </svg><!----></span><!----></button><!---->
+                                        <!----><!----></svelte-css-wrapper> <svelte-css-wrapper
+                                        style="display: contents; --border-right-radius:5px;"><!----><!----><button
+                                            class="icon-button  svelte-1p77nr8" title="Subscript (⌘⇧=)" tabindex="-1"
+                                            disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" id="mdi-format-subscript"
+                                                    viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M16,7.41L11.41,12L16,16.59L14.59,18L10,13.41L5.41,18L4,16.59L8.59,12L4,7.41L5.41,6L10,10.59L14.59,6L16,7.41M21.85,21.03H16.97V20.03L17.86,19.23C18.62,18.58 19.18,18.04 19.56,17.6C19.93,17.16 20.12,16.75 20.13,16.36C20.14,16.08 20.05,15.85 19.86,15.66C19.68,15.5 19.39,15.38 19,15.38C18.69,15.38 18.42,15.44 18.16,15.56L17.5,15.94L17.05,14.77C17.32,14.56 17.64,14.38 18.03,14.24C18.42,14.1 18.85,14 19.32,14C20.1,14.04 20.7,14.25 21.1,14.66C21.5,15.07 21.72,15.59 21.72,16.23C21.71,16.79 21.53,17.31 21.18,17.78C20.84,18.25 20.42,18.7 19.91,19.14L19.27,19.66V19.68H21.85V21.03Z">
+                                                    </path>
+                                                </svg><!----></span><!----></button><!---->
+                                        <!----><!----></svelte-css-wrapper><!----></div><!---->
+                            </div><!---->
+                            <div class="item svelte-u5rx4p"><!---->
+                                <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                                    <!---->
+                                    <div class="svelte-7w2vt8" style="--color-helper-color: #00f"><svelte-css-wrapper
+                                            style="display: contents; --border-left-radius:5px;"><button
+                                                class="icon-button  svelte-1p77nr8" title="Text color (F7)"
+                                                tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                                    style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                        xmlns="http://www.w3.org/2000/svg" id="mdi-format-color-text"
+                                                        viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M9.62,12L12,5.67L14.37,12M11,3L5.5,17H7.75L8.87,14H15.12L16.25,17H18.5L13,3H11Z">
+                                                        </path>
+                                                    </svg><!----> <!----><!----><svg xmlns="http://www.w3.org/2000/svg"
+                                                        id="mdi-color-helper" viewBox="0 0 24 24">
+                                                        <path d="M0,24H24V20H0V24Z"></path>
+                                                    </svg><!----><!----></span><!----></button><!----></svelte-css-wrapper>
+                                        <!----> <button class="icon-button  svelte-1p77nr8" title="Change color (F8)"
+                                            tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 0.5; --icon-size: 120%;"><!----><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" id="mdi-chevron-down"
+                                                    viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z">
+                                                    </path>
+                                                </svg><!----> <input tabindex="-1" type="color" class="svelte-hh2hcg">
+                                                <!----><!----><!----></span><!----></button><!----><!----></div><!---->
+                                    <div class="svelte-7w2vt8" style="--color-helper-color: #00f"><!----><button
+                                            class="icon-button  svelte-1p77nr8" title="Text highlight color"
+                                            tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" id="mdi-format-color-highlight"
+                                                    viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M4,17L6.75,14.25L6.72,14.23C6.14,13.64 6.14,12.69 6.72,12.11L11.46,7.37L15.7,11.61L10.96,16.35C10.39,16.93 9.46,16.93 8.87,16.37L8.24,17H4M15.91,2.91C16.5,2.33 17.45,2.33 18.03,2.91L20.16,5.03C20.74,5.62 20.74,6.57 20.16,7.16L16.86,10.45L12.62,6.21L15.91,2.91Z">
+                                                    </path>
+                                                </svg><!----> <!----><!----><svg xmlns="http://www.w3.org/2000/svg"
+                                                    id="mdi-color-helper" viewBox="0 0 24 24">
+                                                    <path d="M0,24H24V20H0V24Z"></path>
+                                                </svg><!----><!----></span><!----></button><!----> <svelte-css-wrapper
+                                            style="display: contents; --border-right-radius:5px;"><button
+                                                class="icon-button  svelte-1p77nr8" title="Change color" tabindex="-1"
+                                                disabled=""><span class="svelte-111fj0e"
+                                                    style="--width-multiplier: 0.5; --icon-size: 120%;"><!----><!----><!----><!----><svg
+                                                        xmlns="http://www.w3.org/2000/svg" id="mdi-chevron-down"
+                                                        viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z">
+                                                        </path>
+                                                    </svg><!----> <input tabindex="-1" type="color"
+                                                        class="svelte-hh2hcg">
+                                                    <!----><!----><!----></span><!----></button><!----></svelte-css-wrapper><!---->
+                                    </div><!----><!---->
+                                </div><!---->
+                            </div><!---->
+                            <div class="item svelte-u5rx4p"><!---->
+                                <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                                    <svelte-css-wrapper style="display: contents; --border-left-radius:5px;"><button
+                                            class="icon-button  svelte-1p77nr8" title="Remove formatting (⌘R)"
+                                            tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-eraser" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293z">
+                                                    </path>
+                                                </svg><!----></span><!----></button><!----></svelte-css-wrapper> <!---->
+                                    <!----><!----> <!----><span
+                                        class="floating-reference svelte-1rg7qgv"><svelte-css-wrapper
+                                            style="display: contents; --border-right-radius:5px;"><button
+                                                class="icon-button remove-format-button svelte-1p77nr8"
+                                                title="Select formatting to remove" tabindex="-1" disabled=""><span
+                                                    class="svelte-111fj0e"
+                                                    style="--width-multiplier: 0.5; --icon-size: 120%;"><!----><!----><!----><svg
+                                                        xmlns="http://www.w3.org/2000/svg" id="mdi-chevron-down"
+                                                        viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z">
+                                                        </path>
+                                                    </svg><!----></span><!----></button><!----></svelte-css-wrapper><!----></span><!---->
+                                    <!----><!---->
+                                    <div class="floating svelte-1rg7qgv"><!---->
+                                        <div class="floating-arrow svelte-1rg7qgv" hidden="">
+                                            <div class="arrow svelte-137gj59"></div><!---->
+                                        </div>
+                                    </div><!----><!----><!---->
+                                </div><!---->
+                            </div><!----><!----> <!---->
+                        </div><!---->
+                    </div><!---->
+                    <div class="item svelte-u5rx4p" id="blockFormatting"><!---->
+                        <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                            <div class="dynamically-slottable svelte-8in7my"><!---->
+                                <div class="button-group-item svelte-1wfg5gy"
+                                    style="--border-left-radius: 5px; --border-right-radius: 0; ">
+                                    <!----><!----><!----><!----><button class="icon-button  svelte-1p77nr8"
+                                        title="Unordered list (⌘,)" tabindex="-1" disabled=""><span
+                                            class="svelte-111fj0e"
+                                            style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-list-ul" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                    d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2">
+                                                </path>
+                                            </svg><!----></span><!----></button><!----> <!----><!----></div><!---->
+                                <div class="button-group-item svelte-1wfg5gy"
+                                    style="--border-left-radius: 0; --border-right-radius: 0; ">
+                                    <!----><!----><!----><!----><button class="icon-button  svelte-1p77nr8"
+                                        title="Ordered list (⌘.)" tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                            style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!----><svg
+                                                xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-list-ol" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd"
+                                                    d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5">
+                                                </path>
+                                                <path
+                                                    d="M1.713 11.865v-.474H2c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 0 1-.492.594v.033a.615.615 0 0 1 .569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V9H1.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 0 0-.342.338zM2.564 5h-.635V2.924h-.031l-.598.42v-.567l.629-.443h.635z">
+                                                </path>
+                                            </svg><!----></span><!----></button><!----> <!----><!----></div><!---->
+                                <div class="button-group-item svelte-1wfg5gy"
+                                    style="--border-left-radius: 0; --border-right-radius: 5px; "><!----><!----><span
+                                        class="block-buttons svelte-xmsstg"><button class="icon-button  svelte-1p77nr8"
+                                            title="Alignment" tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-text-paragraph"
+                                                    viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd"
+                                                        d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m4-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5">
+                                                    </path>
+                                                </svg><!----></span><!----></button><!----></span><!----> <!---->
+                                    <!----><!---->
+                                    <div class="floating svelte-1rg7qgv"><!---->
+                                        <div class="floating-arrow svelte-1rg7qgv" hidden="">
+                                            <div class="arrow svelte-137gj59"></div><!---->
+                                        </div>
+                                    </div><!----><!---->
+                                </div><!----><!----> <!---->
+                            </div><!---->
+                        </div><!---->
+                    </div><!---->
+                    <div class="item svelte-u5rx4p" id="template"><!---->
+                        <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                            <div class="dynamically-slottable svelte-8in7my"><!---->
+                                <div class="button-group-item svelte-1wfg5gy"
+                                    style="--border-left-radius: 5px; --border-right-radius: 0; "><!----><!----><button
+                                        class="icon-button  svelte-1p77nr8" title="Attach pictures/audio/video (F3)"
+                                        tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                            style="--width-multiplier: 1; --icon-size: 70%;"><!----><!----><!----><svg
+                                                xmlns="http://www.w3.org/2000/svg" id="mdi-paperclip"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z">
+                                                </path>
+                                            </svg><!----></span><!----></button><!----> <!----><!----></div><!---->
+                                <div class="button-group-item svelte-1wfg5gy"
+                                    style="--border-left-radius: 0; --border-right-radius: 0; "><!----><!----><button
+                                        class="icon-button  svelte-1p77nr8" title="Record audio (F5)" tabindex="-1"
+                                        disabled=""><span class="svelte-111fj0e"
+                                            style="--width-multiplier: 1; --icon-size: 70%;"><!----><!----><!----><svg
+                                                xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-mic" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5">
+                                                </path>
+                                                <path
+                                                    d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3">
+                                                </path>
+                                            </svg><!----></span><!----></button><!----> <!----><!----></div><!---->
+                                <div class="button-group-item svelte-1wfg5gy"
+                                    style="--border-left-radius: 0; --border-right-radius: 5px; ">
+                                    <!----><!----><!----><!----> <!----><span
+                                        class="floating-reference svelte-1rg7qgv"><button
+                                            class="icon-button  svelte-1p77nr8" title="Equations" tabindex="-1"
+                                            disabled=""><span class="svelte-111fj0e"
+                                                style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><svg
+                                                    xmlns="http://www.w3.org/2000/svg" id="mdi-function-variant"
+                                                    viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M12.42,5.29C11.32,5.19 10.35,6 10.25,7.11L10,10H12.82V12H9.82L9.38,17.07C9.18,19.27 7.24,20.9 5.04,20.7C3.79,20.59 2.66,19.9 2,18.83L3.5,17.33C3.83,18.38 4.96,18.97 6,18.63C6.78,18.39 7.33,17.7 7.4,16.89L7.82,12H4.82V10H8L8.27,6.93C8.46,4.73 10.39,3.1 12.6,3.28C13.86,3.39 15,4.09 15.66,5.17L14.16,6.67C13.91,5.9 13.23,5.36 12.42,5.29M22,13.65L20.59,12.24L17.76,15.07L14.93,12.24L13.5,13.65L16.35,16.5L13.5,19.31L14.93,20.72L17.76,17.89L20.59,20.72L22,19.31L19.17,16.5L22,13.65Z">
+                                                    </path>
+                                                </svg><!----></span><!----></button><!----></span><!----> <!----><!---->
+                                    <div class="floating svelte-1rg7qgv"><!---->
+                                        <div class="floating-arrow svelte-1rg7qgv" hidden="">
+                                            <div class="arrow svelte-137gj59"></div><!---->
+                                        </div>
+                                    </div><!----><!----> <!----><!---->
+                                </div><!----><!----> <!---->
+                            </div><!---->
+                        </div><!---->
+                    </div><!---->
+                    <div class="item svelte-u5rx4p" id="cloze"><!---->
+                        <div dir="ltr" role="group" class="button-group btn-group  svelte-svn7mu" style="">
+                            <svelte-css-wrapper style="display: contents; --border-left-radius:5px;"><button
+                                    class="icon-button  svelte-1p77nr8" title="Cloze deletion (new card) (⌘⇧C)"
+                                    tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                        style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><!--?xml version="1.0" encoding="UTF-8"?--><svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-contain"
+                                            width="24" height="24" viewBox="0 0 24 24">
+                                            <path
+                                                d="M1 2h6v2h-4v14h4v2h-6zm5 14v-2h2v2zm4 0v-2h2v2zm4 0v-2h2v.54c-.625.583-.891.887-1.191 1.46zM21 2v11.082c-.68-.11-1.32-.11-2 0v-9.082h-4v-2zm0 13v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2Z">
+                                            </path>
+                                        </svg>
+                                        <!----></span><!----></button><!----></svelte-css-wrapper> <!---->
+                            <svelte-css-wrapper style="display: contents; --border-right-radius:5px;"><button
+                                    class="icon-button  svelte-1p77nr8" title="Cloze deletion (same card) (⌘⌥⇧C)"
+                                    tabindex="-1" disabled=""><span class="svelte-111fj0e"
+                                        style="--width-multiplier: 1; --icon-size: 75%;"><!----><!----><!----><svg
+                                            xmlns="http://www.w3.org/2000/svg" id="mdi-contain" viewBox="0 0 24 24">
+                                            <path
+                                                d="M2,3H8V5H4V19H8V21H2V3M7,17V15H9V17H7M11,17V15H13V17H11M15,17V15H17V17H15M22,3V21H16V19H20V5H16V3H22Z">
+                                            </path>
+                                        </svg><!----></span><!----></button><!----></svelte-css-wrapper> <!----><!---->
+                        </div><!---->
+                    </div><!---->
+                    <div class="item svelte-u5rx4p" id="image-occlusion-button"><!----></div><!----><!----> <!---->
+                </div><!---->
+            </div><!---->
+        </div><!----> <!----> <!----> <!----> <!---->
+        <div class="scroll-area-relative svelte-1ximy3">
+            <div class="scroll-area-wrapper  svelte-1ximy3">
+                <div class="scroll-area svelte-1ximy3" style="--scrollbar-height:0px;">
+                    <div class="d-flex flex-column flex-grow-1">
+                        <div class="scroll-edge svelte-1ximy3" data-edge="top"></div>
+                        <div class="d-flex flex-row flex-grow-1">
+                            <div class="scroll-edge svelte-1ximy3" data-edge="left"></div>
+                            <div class="scroll-content flex-grow-1">
+                                <div class="fields svelte-197fndw"><!----><svelte-css-wrapper
+                                        style="display: contents; --description-font-size:20px; --description-content:&quot;&quot;;">
+                                        <div class="field-container svelte-1emq37" role="presentation">
+                                            <svelte-css-wrapper style="display: contents; --icon-align:bottom;">
+                                                <div class="label-container svelte-fcgrnb"><span
+                                                        class="collapse-label svelte-1hjb121" tabindex="-1"
+                                                        role="button" title="Collapse field" aria-expanded="true">
+                                                        <div class="collapse-badge svelte-1u1j1u5"><button tabindex="-1"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 1; --icon-size: 80%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-chevron-down" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></div>
+                                                        <!----> <!----><span
+                                                            class="label-name svelte-y93km6">Text<!----></span><!---->
+                                                    </span><!----> <span
+                                                        class="field-state justify-content-end svelte-3wk0fa"><!----><!---->
+                                                        <span class="plain-text-badge svelte-v0lbrj visible"
+                                                            tabindex="-1" role="button"><button tabindex="-1"
+                                                                title="Toggle HTML Editor (⌘⇧X)"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 1; --icon-size: 80%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-code-tags" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></span><!---->
+                                                        <span tabindex="-1" role="button"
+                                                            class="svelte-ctcakp visible"><button tabindex="-1"
+                                                                title="Toggle sticky (F9)"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 0.7; --icon-size: 100%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-pin-outline" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12M8.8,14L10,12.8V4H14V12.8L15.2,14H8.8Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></span><!----><!----></span><!---->
+                                                </div><!---->
+                                            </svelte-css-wrapper><!---->
+                                            <div class="collapsible svelte-19cn6dv measuring" style="--height:0px;">
+                                                <div class="editor-field svelte-1emq37">
+                                                    <div class="editing-area svelte-1h3rbd1"><!----><!---->
+                                                        <div class="collapsible svelte-19cn6dv full-hide measuring"
+                                                            style="--height:0px;">
+                                                            <div class="rich-text-input svelte-1dm1bxr"><!---->
+                                                                <div class="rich-text-relative svelte-1dm1bxr">
+                                                                    <div class="rich-text-editable svelte-1dm1bxr">
+                                                                        <anki-editable contenteditable="true" role="textbox" tabindex="0" class="svelte-18uwveo">Difficulty<br></anki-editable>
+                                                                    </div>
+                                                                    <div class="rich-text-widgets"><!----></div><!---->
+                                                                </div><!---->
+                                                            </div><!---->
+                                                        </div> <!----><!---->
+                                                        <div class="collapsible svelte-19cn6dv full-hide hidden"
+                                                            style="--height:0px;">
+                                                            <div class="plain-text-input svelte-82z998 light-theme"
+                                                                hidden="">
+                                                                <div class="code-mirror svelte-1uqohtk"><textarea
+                                                                        tabindex="-1" hidden=""></textarea></div><!---->
+                                                            </div><!---->
+                                                        </div> <!----><!----><!---->
+                                                    </div><!---->
+                                                </div><!---->
+                                            </div> <!----><!---->
+                                        </div><!---->
+                                    </svelte-css-wrapper><svelte-css-wrapper
+                                        style="display: contents; --description-font-size:20px; --description-content:&quot;&quot;;">
+                                        <div class="field-container svelte-1emq37" role="presentation">
+                                            <svelte-css-wrapper style="display: contents; --icon-align:bottom;">
+                                                <div class="label-container svelte-fcgrnb"><span
+                                                        class="collapse-label svelte-1hjb121" tabindex="-1"
+                                                        role="button" title="Collapse field" aria-expanded="true">
+                                                        <div class="collapse-badge svelte-1u1j1u5"><button tabindex="-1"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 1; --icon-size: 80%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-chevron-down" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></div>
+                                                        <!----> <!----><span class="label-name svelte-y93km6">Back
+                                                            Extra<!----></span><!---->
+                                                            
+                                                    </span><!----> <span
+                                                        class="field-state justify-content-end svelte-3wk0fa"><!----><!---->
+                                                        <span class="plain-text-badge svelte-v0lbrj visible"
+                                                            tabindex="-1" role="button"><button tabindex="-1"
+                                                                title="Toggle HTML Editor (⌘⇧X)"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 1; --icon-size: 80%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-code-tags" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></span><!---->
+                                                        <span tabindex="-1" role="button"
+                                                            class="svelte-ctcakp visible"><button tabindex="-1"
+                                                                title="Toggle sticky (F9)"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 0.7; --icon-size: 100%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-pin-outline" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12M8.8,14L10,12.8V4H14V12.8L15.2,14H8.8Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></span><!----><!----></span><!---->
+                                                </div><!---->
+                                            </svelte-css-wrapper><!---->
+                                            <div class="collapsible svelte-19cn6dv measuring" style="--height:0px;">
+                                                <div class="editor-field svelte-1emq37">
+                                                    <div class="editing-area svelte-1h3rbd1"><!----><!---->
+                                                        <div class="collapsible svelte-19cn6dv full-hide measuring"
+                                                            style="--height:0px;">
+                                                            <div class="rich-text-input svelte-1dm1bxr"><!---->
+                                                                <div class="rich-text-relative svelte-1dm1bxr">
+                                                                    <div class="rich-text-editable svelte-1dm1bxr">
+                                                                        <anki-editable contenteditable="true" role="textbox" tabindex="0" class="svelte-18uwveo">Difficulty<br></anki-editable>
+                                                                    </div>
+                                                                    <div class="rich-text-widgets"><!----></div><!---->
+                                                                </div><!---->
+                                                            </div><!---->
+                                                        </div> <!----><!---->
+                                                        <div class="collapsible svelte-19cn6dv full-hide hidden"
+                                                            style="--height:0px;">
+                                                            <div class="plain-text-input svelte-82z998 light-theme"
+                                                                hidden="">
+                                                                <div class="code-mirror svelte-1uqohtk"><textarea
+                                                                        tabindex="-1" hidden=""></textarea></div><!---->
+                                                            </div><!---->
+                                                        </div> <!----><!----><!---->
+                                                    </div><!---->
+                                                </div><!---->
+                                            </div> <!----><!---->
+                                        </div><!---->
+                                    </svelte-css-wrapper><svelte-css-wrapper
+                                        style="display: contents; --description-font-size:20px; --description-content:&quot;&quot;;">
+                                        <div class="field-container svelte-1emq37" role="presentation">
+                                            <svelte-css-wrapper style="display: contents; --icon-align:bottom;">
+                                                <div class="label-container svelte-fcgrnb"><span
+                                                        class="collapse-label svelte-1hjb121" tabindex="-1"
+                                                        role="button" title="Collapse field" aria-expanded="true">
+                                                        <div class="collapse-badge svelte-1u1j1u5"><button tabindex="-1"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 1; --icon-size: 80%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-chevron-down" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></div>
+                                                        <!----> <!----><span
+                                                            class="label-name svelte-y93km6">Difficulty<!----></span><!---->
+                                                    </span><!----> <span
+                                                        class="field-state justify-content-end svelte-3wk0fa"><!----><!---->
+                                                        <span class="plain-text-badge svelte-v0lbrj visible"
+                                                            tabindex="-1" role="button"><button tabindex="-1"
+                                                                title="Toggle HTML Editor (⌘⇧X)"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 1; --icon-size: 80%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-code-tags" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></span><!---->
+                                                        <span tabindex="-1" role="button"
+                                                            class="svelte-ctcakp visible"><button tabindex="-1"
+                                                                title="Toggle sticky (F9)"
+                                                                class="badge  svelte-tvhc1n"><span
+                                                                    class="svelte-111fj0e"
+                                                                    style="--width-multiplier: 0.7; --icon-size: 100%;"><!----><!----><!----><svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        id="mdi-pin-outline" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12M8.8,14L10,12.8V4H14V12.8L15.2,14H8.8Z">
+                                                                        </path>
+                                                                    </svg><!----></span><!----></button><!----></span><!----><!----></span><!---->
+                                                </div><!---->
+                                            </svelte-css-wrapper><!---->
+                                            <div class="collapsible svelte-19cn6dv measuring" style="--height:0px;">
+                                                <div class="editor-field svelte-1emq37">
+                                                    <div class="editing-area svelte-1h3rbd1"><!----><!---->
+                                                        <div class="collapsible svelte-19cn6dv full-hide measuring"
+                                                            style="--height:0px;">
+                                                            <div class="rich-text-input svelte-1dm1bxr"><!---->
+                                                                <div class="rich-text-relative svelte-1dm1bxr">
+                                                                    <div class="rich-text-editable svelte-1dm1bxr">
+                                                                        <anki-editable contenteditable="true" role="textbox" tabindex="0" class="svelte-18uwveo">Difficulty<br></anki-editable>
+                                                                    </div>
+                                                                    <div class="rich-text-widgets"><!----></div><!---->
+                                                                </div><!---->
+                                                            </div><!---->
+                                                        </div> <!----><!---->
+                                                        <div class="collapsible svelte-19cn6dv full-hide hidden"
+                                                            style="--height:0px;">
+                                                            <div class="plain-text-input svelte-82z998 light-theme"
+                                                                hidden="">
+                                                                <div class="code-mirror svelte-1uqohtk"><textarea
+                                                                        tabindex="-1" hidden=""></textarea></div><!---->
+                                                            </div><!---->
+                                                        </div> <!----><!----><!---->
+                                                    </div><!---->
+                                                </div><!---->
+                                            </div> <!----><!---->
+                                        </div><!---->
+                                    </svelte-css-wrapper><!---->
+                                    <div class="mathjax-overlay"><!----></div><!---->
+                                    <div class="image-overlay"><!----></div><!----><!---->
+                                </div>
+                                <div id="root-react"></div><!---->
+                            </div>
+                            <div class="scroll-edge svelte-1ximy3" data-edge="right"></div>
+                        </div>
+                        <div class="scroll-edge svelte-1ximy3" data-edge="bottom"></div>
+                    </div>
+                </div> <!----> <!----> <!----> <!---->
+            </div>
+        </div><!----> <!----> <span class="collapse-label svelte-1hjb121" tabindex="-1" role="button" title="Expand"
+            aria-expanded="false">
+            <div class="collapse-badge svelte-1u1j1u5 collapsed"><button tabindex="-1"
+                    class="badge  svelte-tvhc1n"><span class="svelte-111fj0e"
+                        style="--width-multiplier: 1; --icon-size: 80%;"><!----><!----><!----><svg
+                            xmlns="http://www.w3.org/2000/svg" id="mdi-chevron-down" viewBox="0 0 24 24">
+                            <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path>
+                        </svg><!----></span><!----></button><!----></div><!----> <!----> Tags<!---->
+        </span><!---->
+        <div class="collapsible svelte-19cn6dv full-hide hidden" style="--height:0px;"><!----><!---->
+            <div class="tag-editor svelte-1abeqln"><svelte-css-wrapper
+                    style="display: contents; --icon-align:baseline;">
+                    <div class="tag-options-button gap svelte-16efk4p"><!---->
+                        <div class="tag-add-button svelte-1rjs6r4" role="button" title="Add tag (⌘⇧T)" tabindex="0">
+                            <span class="svelte-111fj0e"
+                                style="--width-multiplier: 1; --icon-size: 100%;"><!----><!----><!----><svg
+                                    xmlns="http://www.w3.org/2000/svg" id="mdi-tag-outline" viewBox="0 0 24 24">
+                                    <path
+                                        d="M21.41 11.58L12.41 2.58A2 2 0 0 0 11 2H4A2 2 0 0 0 2 4V11A2 2 0 0 0 2.59 12.42L11.59 21.42A2 2 0 0 0 13 22A2 2 0 0 0 14.41 21.41L21.41 14.41A2 2 0 0 0 22 13A2 2 0 0 0 21.41 11.58M13 20L4 11V4H11L20 13M6.5 5A1.5 1.5 0 1 1 5 6.5A1.5 1.5 0 0 1 6.5 5Z">
+                                    </path>
+                                </svg><!----> <!----><!----><svg xmlns="http://www.w3.org/2000/svg"
+                                    id="mdi-tag-plus-outline" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6.5 5A1.5 1.5 0 1 0 8 6.5A1.5 1.5 0 0 0 6.5 5M6.5 5A1.5 1.5 0 1 0 8 6.5A1.5 1.5 0 0 0 6.5 5M21.41 11.58L12.41 2.58A2 2 0 0 0 11 2H4A2 2 0 0 0 2 4V11A2 2 0 0 0 2.59 12.42L3 12.82A5.62 5.62 0 0 1 5.08 12.08L4 11V4H11L20 13L13 20L11.92 18.92A5.57 5.57 0 0 1 11.18 21L11.59 21.41A2 2 0 0 0 13 22A2 2 0 0 0 14.41 21.41L21.41 14.41A2 2 0 0 0 22 13A2 2 0 0 0 21.41 11.58M6.5 5A1.5 1.5 0 1 0 8 6.5A1.5 1.5 0 0 0 6.5 5M10 19H7V22H5V19H2V17H5V14H7V17H10Z">
+                                    </path>
+                                </svg><!----><!----></span><!----> <span class="tags-info svelte-1rjs6r4"><!----></span>
+                        </div> <!----><!---->
+                    </div><!---->
+                </svelte-css-wrapper> <!---->
+                <div class="tag-spacer svelte-1k3couf" role="textbox" tabindex="-1"><br></div><!---->
+            </div><!---->
+        </div> <!----><!----><!---->
+    </div>
+</body>
+
+</html>
