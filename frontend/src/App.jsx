@@ -34,7 +34,7 @@ function App() {
 
     // State for controlling the visibility of the "Buy me a coffee" button
     const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false);
-    const [tiggerBuyMeACoffee, setTriggerBuyMeACoffee] = useState(0);
+    const [triggerBuyMeACoffee, setTriggerBuyMeACoffee] = useState(0);
 
     // UseEffect to determine if the "Buy me a coffee" button should be shown
     useEffect(() => {
@@ -46,7 +46,7 @@ function App() {
                 setShowBuyMeACoffee(false);
             }, 20000);
         }
-    }, [tiggerBuyMeACoffee]); // Empty dependency array ensures this runs only once on mount
+    }, [triggerBuyMeACoffee]); // Empty dependency array ensures this runs only once on mount
 
     // Use useEffect to check DOM once and set state
     useEffect(() => {
@@ -199,7 +199,6 @@ function App() {
                     Like this Addon? Consider Buying Me a Coffee!
                 </Button>
             )}
-
         </Card>
     );
 }
