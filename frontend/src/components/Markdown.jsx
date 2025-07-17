@@ -14,9 +14,9 @@ import 'katex/dist/katex.min.css';
 
 // Function to decode HTML entities
 const decodeHtmlEntities = (text) => {
-  const textArea = document.createElement('textarea')
-  textArea.innerHTML = text
-  return textArea.value
+    const textArea = document.createElement('textarea')
+    textArea.innerHTML = text
+    return textArea.value
 }
 
 
@@ -34,7 +34,8 @@ function decodeMarkdownMathContent(markdownText) {
             return `\\[${processedContent}\\]`;
         }
     });
-    const inlineMathRegex = /((?<!\$)\$([^$\n]+)\$(?!\$)|\\\(([^)]*?)\\\))/g;
+    const inlineMathRegex = /((?<!\\)\$([^$\n]+?)(?<!\\)\$(?!\$)|\\\(([^)]*?)\\\))/g;
+    res = res.replace(/\\\$/g, '🪷');
     res = res.replace(inlineMathRegex, (match, fullMatch, dollarContent, parenContent) => {
         let content = dollarContent || parenContent;
         let processedContent = content.replace(/<br\s*\/?>/gi, ' ');
@@ -155,6 +156,12 @@ const Markdown = ({
                 remarkPlugins={[remarkMath, remarkGfm]} // Math and Table support
                 rehypePlugins={buildRehypePlugins()}
                 components={{
+                    span: ({ className, children, ...props }) => {
+                        if (typeof children === 'string' && children.includes('🪷')) {
+                            children = children.replace(/🪷/g, '$')
+                        };
+                        return <span className={className} {...props}>{children}</span>;
+                    },
                     pre: ({ children, ...props }) => {
                         // Return a div instead of pre to avoid double wrapping
                         return <div {...props}>{children}</div>;
