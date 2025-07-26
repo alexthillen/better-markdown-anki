@@ -22,10 +22,13 @@ const decodeHtmlEntities = (text) => {
 
 function decodeMarkdownMathContent(markdownText) {
     // Handle block math: $$...$$ and \[...\]
-    const blockMathRegex = /(\$\$([\s\S]*?)\$\$|\\\[([\s\S]*?)\\\])/g;
+    const blockMathRegex = /((?<!\\)\$\$([\s\S]*?)(?<!\\)\$\$|\\\[([\s\S]*?)\\\])/g;
 
     let res = markdownText.replace(blockMathRegex, (match, fullMatch, dollarContent, bracketContent) => {
         let content = dollarContent || bracketContent;
+        if (content.endsWith('\\$')) {
+            content += ' ';
+        }
         let processedContent = content.replace(/<br\s*\/?>/gi, '\n');
         processedContent = decodeHtmlEntities(processedContent);
         if (dollarContent !== undefined) {
@@ -34,11 +37,11 @@ function decodeMarkdownMathContent(markdownText) {
             return `\\[${processedContent}\\]`;
         }
     });
-    const inlineMathRegex = /((?<!\\)\$([^$\n]+?)(?<!\\)\$(?!\$)|\\\(([^)]*?)\\\))/g;
-    res = res.replace(/\\\$/g, '🪷');
+    const inlineMathRegex = /((?<!\\)\$((?:[^$\n\\]|\\.)+?)(?<!\\)\$(?!\$)|\\\(([^)]*?)\\\))/g;
     res = res.replace(inlineMathRegex, (match, fullMatch, dollarContent, parenContent) => {
         let content = dollarContent || parenContent;
         let processedContent = content.replace(/<br\s*\/?>/gi, ' ');
+        processedContent = processedContent.replace(/\\\$/g, '🪷');
         processedContent = decodeHtmlEntities(processedContent);
         if (dollarContent !== undefined) {
             return `$${processedContent}$`;
@@ -173,11 +176,10 @@ const Markdown = ({
                     }) => {
                         const match = /language-(\w+)/.exec(codeClassName || '');
                         const codeString = String(decodeHtmlEntities(codeChildren)).replace(/^\n/, '').replace(/\n$/, '');
-                        return match ? (
-                            <SyntaxHighlighter
+                        return (<SyntaxHighlighter
                                 style={syntaxTheme}
-                                language={match[1]}
-                                PreTag="div"
+                                language={(match && match[1]) || 'text'}
+                                PreTag={(match || String(codeChildren).includes('\n') ? 'div' : 'span')}
                                 customStyle={{
                                     ...syntaxHighlighterCustomStyle,
                                 }}
@@ -193,12 +195,7 @@ const Markdown = ({
                                 {...props}
                             >
                                 {codeString}
-                            </SyntaxHighlighter>
-                        ) : (
-                            <code style={inlineCodeStyles} {...props}>
-                                {codeString}
-                            </code>
-                        );
+                            </SyntaxHighlighter>);
                     },
                     // Table components using Mantine
                     table: ({ children, ...props }) => (

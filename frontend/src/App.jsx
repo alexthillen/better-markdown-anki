@@ -39,12 +39,12 @@ function App() {
     // UseEffect to determine if the "Buy me a coffee" button should be shown
     useEffect(() => {
         const random = Math.random();
-        if (random <= 0.01) {
+        if (random <= 0.002) {
             setShowBuyMeACoffee(true);
             // Set a timeout to hide the button after 20 seconds
             const _timer = setTimeout(() => {
                 setShowBuyMeACoffee(false);
-            }, 20000);
+            }, 7000);
         }
     }, [triggerBuyMeACoffee]); // Empty dependency array ensures this runs only once on mount
 
