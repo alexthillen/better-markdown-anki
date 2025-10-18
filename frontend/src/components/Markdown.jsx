@@ -106,7 +106,8 @@ const Markdown = ({
         return content
             .replace(/<br\s*\/?>/gi, '\n')
             .replace(/<div\s*\/?>/gi, '\n') // TODO : maybe only do this in code blocks?
-            .replace(/<\/div>/gi, '\n');
+            .replace(/<\/div>/gi, '\n')
+            .replace(/(&nbsp;)/gi, ' ');
     };
 
     // Process content with HTML break preprocessing
