@@ -150,6 +150,16 @@ const Markdown = ({
         return plugins;
     };
 
+    const handleStringChildrenSpan = (childrenString) => {
+        if (childrenString.includes('🪷')) {
+            childrenString = childrenString.replace(/🪷/g, '$');
+        }
+        if (childrenString.includes('\n')) {
+            childrenString = childrenString.replace(/\n/g, '<br />');
+        }
+        return childrenString;
+    }
+
     return (
         <TypographyStylesProvider className={`${className} markdown-content`}
             style={{
@@ -161,9 +171,20 @@ const Markdown = ({
                 rehypePlugins={buildRehypePlugins()}
                 components={{
                     span: ({ className, children, ...props }) => {
-                        if (typeof children === 'string' && children.includes('🪷')) {
-                            children = children.replace(/🪷/g, '$')
-                        };
+
+
+                        if (typeof children === 'string') {
+                            children = handleStringChildrenSpan(children);
+                            return <span className={className} dangerouslySetInnerHTML={{ __html: children }} {...props} />;
+                        } else if (Array.isArray(children)) {
+                            const processedChildren = children.map(child => {
+                                if (typeof child === 'string') {
+                                    return <span dangerouslySetInnerHTML={{ __html: handleStringChildrenSpan(child) }} />;
+                                }
+                                return child;
+                            });
+                            return <span className={className} {...props}>{processedChildren}</span>;
+                        }
                         return <span className={className} {...props}>{children}</span>;
                     },
                     pre: ({ children, ...props }) => {

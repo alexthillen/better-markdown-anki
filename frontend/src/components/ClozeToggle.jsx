@@ -9,10 +9,10 @@ function ClozeToggle({ spanElement, label, text }) {
     }, [text]);
 
     const toggleCloze = (spanElement) => {
-        const currentDataCloze = spanElement.getAttribute('data-cloze');
-        const currentText = spanElement.textContent;
+        const currentDataCloze = decodeURIComponent(spanElement.getAttribute('data-cloze')  || '');
+        const currentText = encodeURIComponent(spanElement.innerHTML) || '';
         spanElement.setAttribute('data-cloze', currentText);
-        spanElement.textContent = currentDataCloze;
+        spanElement.innerHTML = currentDataCloze;
     }
 
     return (

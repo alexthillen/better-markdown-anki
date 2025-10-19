@@ -21,17 +21,6 @@ function removeClozeSpans(htmlString) {
     return res;
 }
 
-function removeLeadingClozeWhiteSpace(markdownText) {
-    const doc = document.implementation.createHTMLDocument('');
-    doc.body.innerHTML = markdownText;
-    const clozeSpans = doc.querySelectorAll('span.cloze');
-    clozeSpans.forEach(span => {
-        // Remove leading newlines or whitespace or <br> from innerHTML
-        span.innerHTML = span.innerHTML.replace(/^(\s*(\r?\n|<br\s*\/?>))*/gi, '');
-    });
-    // Return the modified HTML
-    return doc.body.innerHTML;
-}
 
 function replaceCodeContent(markdownText) {
     const codeBlockRegex = /\`\`\`(\w*)([\s\S]*?)\`\`\`/g;
@@ -129,8 +118,7 @@ function ClozeCard(
         if (!node) return '';
         const res = replaceCodeContent(node.innerHTML.trim() || '');
         const mathRes = replaceMarkdownMathContent(res);
-        const finalRes = removeLeadingClozeWhiteSpace(mathRes);
-        return finalRes;
+        return mathRes;
     }
 
     function symmetricConcat(s1, s2) {
@@ -159,7 +147,10 @@ function ClozeCard(
                     <Group mb="xs">
                         {clozeSpans.length > 0 && (
                             clozeSpans.map((span, index) => (
-                                <ClozeToggle key={index} spanElement={span} label={`Cloze ${index + 1}`} text={symmetricConcat(span.getAttribute('data-cloze'), span.textContent)} />
+                                <ClozeToggle key={index} spanElement={span} label={`Cloze ${index + 1}`} 
+                                text={symmetricConcat(
+                                    decodeURIComponent(span.getAttribute('data-cloze')  || ''), 
+                                    span.innerHTML)} />
                             ))
                         )}
                     </Group>
