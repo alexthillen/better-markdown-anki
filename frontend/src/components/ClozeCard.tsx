@@ -1,26 +1,26 @@
-import React, { useRef } from 'react'
-import { useEffect, useState } from 'react';
-import Markdown from './Markdown'
+import React, { useRef, useEffect, useState } from 'react';
+import Markdown from './Markdown';
 import { Card, Paper, Stack, Text, Switch, Group } from '@mantine/core';
 import ClozeToggle from './ClozeToggle';
+
+function safeDecode(str) {
+    try {
+        return decodeURIComponent(str || '');
+    } catch (e) {
+        console.warn('Cloze decoding failed, using raw string:', str);
+        return str || '';
+    }
+}
 
 function removeClozeSpans(htmlString) {
     const doc = document.implementation.createHTMLDocument('');
     doc.body.innerHTML = htmlString;
-
-    // Find all spans with class "cloze"
     const clozeSpans = doc.querySelectorAll('span.cloze, span.cloze-inactive');
-    
     clozeSpans.forEach(span => {
-        // Replace the span with its content (unwrap)
         span.outerHTML = span.innerHTML;
     });
-
-    // Return the modified HTML
-    let res = doc.body.innerHTML;
-    return res;
+    return doc.body.innerHTML;
 }
-
 
 function replaceCodeContent(markdownText) {
     const codeBlockRegex = /\`\`\`(\w*)([\s\S]*?)\`\`\`/g;
@@ -41,15 +41,11 @@ function replaceCodeContent(markdownText) {
 }
 
 function replaceMarkdownMathContent(markdownText) {
-    // Handle block math: $$...$$ and \[...\]
     const blockMathRegex = /(\$\$([\s\S]*?)\$\$|\\\[([\s\S]*?)\\\])/g;
-
     let res = markdownText.replace(blockMathRegex, (match, fullMatch, dollarContent, bracketContent) => {
         let content = dollarContent || bracketContent;
         let processedContent = content.replace(/<br\s*\/?>/gi, '\n');
         processedContent = removeClozeSpans(processedContent);
-
-        // Preserve original delimiter style
         if (dollarContent !== undefined) {
             return `$$${processedContent}$$`;
         } else {
@@ -57,15 +53,11 @@ function replaceMarkdownMathContent(markdownText) {
         }
     });
 
-    // Handle inline math: $...$ and \(...\)
     const inlineMathRegex = /((?<!\$)\$([^$\n]+)\$(?!\$)|\\\(([^)]*?)\\\))/g;
-
     res = res.replace(inlineMathRegex, (match, fullMatch, dollarContent, parenContent) => {
         let content = dollarContent || parenContent;
         let processedContent = content.replace(/<br\s*\/?>/gi, ' ');
         processedContent = removeClozeSpans(processedContent);
-
-        // Preserve original delimiter style
         if (dollarContent !== undefined) {
             return `$${processedContent}$`;
         } else {
@@ -75,7 +67,6 @@ function replaceMarkdownMathContent(markdownText) {
 
     return res;
 }
-
 
 // @ts-ignore
 const isDev = import.meta.env.DEV;
@@ -106,11 +97,13 @@ function ClozeCard(
         extra: 'Loading...'
     });
     const [resetToggle, setResetToggle] = useState(0);
+    
     const getBorderStyle = (borderColor) => (theme) => {
         const [colorKey, shadeStr] = borderColor.split('.');
         const shade = parseInt(shadeStr, 10);
         return { border: `1px solid ${theme.colors[colorKey][shade]}` };
     };
+
     const root = document.getElementById('front-card-cloze');
     const clozeSpans = Array.from(root ? root.querySelectorAll('span.cloze') : []);
 
@@ -127,7 +120,7 @@ function ClozeCard(
 
     useEffect(() => {
         if (clozeCardContent.back !== nodeToMarkdown(backNode)) {
-            setResetToggle(prev => prev + 1); // Increment to reset toggles
+            setResetToggle(prev => prev + 1); 
         }
 
         setClozeCardContent({
@@ -136,6 +129,7 @@ function ClozeCard(
             extra: nodeToMarkdown(extraNode)
         });
     }, [frontNode, backNode, extraNode, contentVersion]);
+
     return (
         <div ref={containerRef}>
             <Stack gap="md">
@@ -147,10 +141,15 @@ function ClozeCard(
                     <Group mb="xs">
                         {clozeSpans.length > 0 && (
                             clozeSpans.map((span, index) => (
-                                <ClozeToggle key={index} spanElement={span} label={`Cloze ${index + 1}`} 
-                                text={symmetricConcat(
-                                    decodeURIComponent(span.getAttribute('data-cloze')  || ''), 
-                                    span.innerHTML)} />
+                                <ClozeToggle 
+                                    key={index} 
+                                    spanElement={span} 
+                                    label={`Cloze ${index + 1}`} 
+                                    text={symmetricConcat(
+                                        safeDecode(span.getAttribute('data-cloze')), 
+                                        span.innerHTML
+                                    )} 
+                                />
                             ))
                         )}
                     </Group>
@@ -188,7 +187,6 @@ function ClozeCard(
                     </Paper>
                 </div>)}
 
-                {/* Extra section (fixed the typo: was "FRONT", now "EXTRA") */}
                 {clozeCardContent.extra && (<div>
                     <Text fw={600} size="lg" mb="xs" c="dimmed">
                         EXTRA
