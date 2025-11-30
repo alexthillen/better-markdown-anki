@@ -39,3 +39,7 @@ main {
     min-height: 0px !important;
     max-height: 10vh;
 }
+
+#root-react {
+    margin-bottom: 100px;
+}
