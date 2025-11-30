@@ -34,3 +34,8 @@
 #difficulty-card, #difficulty-card-basic, #difficulty-card-cloze {
     display: none !important;
 }
+
+main {
+    min-height: 0px !important;
+    max-height: 10vh;
+}
