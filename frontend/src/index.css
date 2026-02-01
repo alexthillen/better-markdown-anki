@@ -43,3 +43,13 @@ main {
 #root-react {
     margin-bottom: 100px;
 }
+
+/* Viewer.js: ensure it sits above Anki UI layers (lift only the container; Viewer handles internal stacking) */
+.viewer-container {
+  z-index: 2147483647 !important;
+}
+
+/* Default affordance: images are zoomable */
+img.bma-viewer-img {
+  cursor: zoom-in;
+}

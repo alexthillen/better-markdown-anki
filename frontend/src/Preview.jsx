@@ -14,7 +14,7 @@ function Preview() {
 
     const [basicNodes, setBasicNodes] = useState({ front: '', back: '', extra: '', contentVersion: 0 });
     const [clozeNodes, setClozeNodes] = useState({ front: '', back: '', extra: '', contentVersion: 0 });
-    const [tags, setTags] = useState([]);
+    const [tags, _setTags] = useState([]);
     const [difficulty, setDifficulty] = useState(null);
     const [showBuyMeACoffee, setShowBuyMeACoffee] = useState(false);
     const [triggerBuyMeACoffee, setTriggerBuyMeACoffee] = useState(0);
@@ -81,7 +81,7 @@ function Preview() {
         // Initial setup
         debouncedUpdateFromFields();
 
-        const observer = new MutationObserver((mutationsList) => {
+        const observer = new MutationObserver(() => {
             debouncedUpdateFromFields();
         });
         const observed_node = document.body.querySelector(".note-editor")
@@ -92,7 +92,7 @@ function Preview() {
             attributes: true,
         });
 
-        const handleKeyUp = (event) => {
+        const handleKeyUp = () => {
             debouncedUpdateFromFields();
         };
         window.addEventListener('keyup', handleKeyUp);

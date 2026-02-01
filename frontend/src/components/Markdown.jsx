@@ -1,5 +1,8 @@
 import { TypographyStylesProvider, useMantineColorScheme, Table } from '@mantine/core';
+import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import Viewer from 'viewerjs';
+import 'viewerjs/dist/viewer.css';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm'; // Added for table support
 import rehypeKatex from 'rehype-katex';
@@ -96,6 +99,9 @@ const Markdown = ({
     const { colorScheme } = useMantineColorScheme();
     const syntaxTheme = colorScheme === 'dark' ? oneDark : oneLight;
 
+    const containerRef = useRef(null);
+    const viewerHostRef = useRef(null);
+
     const preprocessSpecialCharacters = (content) => {
         // \: --> :
         return content.replace(/\\:/g, ':');
@@ -112,14 +118,62 @@ const Markdown = ({
 
     // Process content with HTML break preprocessing
     const processedContent = (() => {
-        let content = allowHtml ? children : decodeHtmlEntities(children);
+        let content = decodeHtmlEntities(children);
         content = preprocessHtmlBreaks(content);
         content = preprocessSpecialCharacters(content);
         content = decodeMarkdownMathContent(content);
         return content;
     })();
 
-    const inlineCodeStyles = {
+    useEffect(() => {
+        const localContainer = containerRef.current;
+        if (!localContainer) return;
+
+        const viewerHost = localContainer.closest('#root-react') || document.getElementById('root-react') || localContainer;
+        viewerHostRef.current = viewerHost;
+
+        if (!viewerHost.__bmaViewer) {
+            viewerHost.__bmaViewer = {
+                refs: 0,
+                viewer: new Viewer(viewerHost, {
+                    filter: (image) => image.classList?.contains('bma-viewer-img'),
+                    navbar: true,
+                    toolbar: true,
+                    title: true,
+                    fullscreen: true,
+                    transition: true,
+                    zoomable: true,
+                    movable: true,
+                    rotatable: true,
+                    scalable: true,
+                    keyboard: true,
+                    zIndex: 2147483647,
+                }),
+            };
+        }
+
+        viewerHost.__bmaViewer.refs += 1;
+        requestAnimationFrame(() => viewerHost.__bmaViewer?.viewer?.update());
+
+        return () => {
+            const state = viewerHost.__bmaViewer;
+            if (!state) return;
+            state.refs -= 1;
+            if (state.refs <= 0) {
+                state.viewer.destroy();
+                delete viewerHost.__bmaViewer;
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        const viewerHost = viewerHostRef.current;
+        const viewer = viewerHost?.__bmaViewer?.viewer;
+        if (!viewer) return;
+        requestAnimationFrame(() => viewer.update());
+    }, [processedContent]);
+
+    const _inlineCodeStyles = {
         backgroundColor: colorScheme === 'dark' ? '#2d3748' : '#f7fafc',
         color: colorScheme === 'dark' ? '#e2e8f0' : '#2d3748',
         padding: '2px 4px',
@@ -161,7 +215,9 @@ const Markdown = ({
     }
 
     return (
-        <TypographyStylesProvider className={`${className} markdown-content`}
+        <TypographyStylesProvider
+            ref={containerRef}
+            className={`${className} markdown-content`}
             style={{
                 fontSize: '24px',
                 lineHeight: '1.4',
@@ -219,6 +275,12 @@ const Markdown = ({
                                 {codeString}
                             </SyntaxHighlighter>);
                     },
+                    img: ({ className: imgClassName, ...props }) => (
+                        <img
+                            {...props}
+                            className={`${imgClassName || ''} bma-viewer-img`.trim()}
+                        />
+                    ),
                     // Table components using Mantine
                     table: ({ children, ...props }) => (
                         <Table
