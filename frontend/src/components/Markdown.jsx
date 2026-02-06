@@ -104,7 +104,7 @@ const Markdown = ({
 
     const preprocessSpecialCharacters = (content) => {
         // \: --> :
-        return content.replace(/\\:/g, ':');
+        return content.replace(/\\:/g, ':').replace(/&gt;/g, '>').replace(/&lt;/g, '<');
     };
 
     // Preprocess HTML breaks to newlines
@@ -118,7 +118,7 @@ const Markdown = ({
 
     // Process content with HTML break preprocessing
     const processedContent = (() => {
-        let content = decodeHtmlEntities(children);
+        let content = allowHtml ? children : decodeHtmlEntities(children);
         content = preprocessHtmlBreaks(content);
         content = preprocessSpecialCharacters(content);
         content = decodeMarkdownMathContent(content);
