@@ -15,11 +15,18 @@ TAG = "DEV_TAG" # Replace with actual release tag
 ADDON_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 DIST_DIRECTORY = os.path.join(ADDON_DIRECTORY, "dist")
 PREVIEW_DIRECTORY = os.path.join(ADDON_DIRECTORY, "preview")
+ADDON_PACKAGE = mw.addonManager.addonFromModule(__name__)
 
 # TEMPLATES
 TEMPLATE_DIR = os.path.join(ADDON_DIRECTORY, "templates")
-PREVIEW_SCRIPT = patch_variables_in_file(os.path.join(PREVIEW_DIRECTORY, "script.js"), dict(TAG=TAG))
-SCRIPT_TEMPLATE = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "script.html"), dict(TAG=TAG))
+PREVIEW_SCRIPT = patch_variables_in_file(
+    os.path.join(PREVIEW_DIRECTORY, "script.js"),
+    dict(TAG=TAG, ADDON_PACKAGE=ADDON_PACKAGE),
+)
+SCRIPT_TEMPLATE = patch_variables_in_file(
+    os.path.join(TEMPLATE_DIR, "script.html"),
+    dict(TAG=TAG, ADDON_PACKAGE=ADDON_PACKAGE),
+)
 CSS_TEMPLATE = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "style.css"), dict(TAG=TAG))
 BASIC_TEMPLATE_FRONT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "basic", "front.html"), dict()) + SCRIPT_TEMPLATE
 BASIC_TEMPLATE_BACK = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "basic", "back.html"), dict()) + SCRIPT_TEMPLATE
@@ -42,11 +49,21 @@ FIELDS_CLOZE = ["Text", "Back Extra", "Difficulty"]
 # Preview
 def markdownPreview(editor):
     """This function runs when the user opens the editor, creates the markdown preview area"""
+    if editor.note is None:
+        print("[BMA Preview] loadNote hook fired, but editor.note is None")
+        return
+
     note_type = editor.note.note_type()["name"]
     flags = re.IGNORECASE
-    if re.match(r".*Better Markdown.*|.*SnapDeck.*", note_type, flags):
+    should_attach_preview = bool(re.match(r".*Better Markdown.*|.*SnapDeck.*", note_type, flags))
+    print(f"[BMA Preview] loadNote hook fired for note type: {note_type}")
+    print(f"[BMA Preview] preview eligible: {should_attach_preview}")
+
+    if should_attach_preview:
+        print("[BMA Preview] injecting preview loader script into editor webview")
         editor.web.eval(PREVIEW_SCRIPT)
     else:
+        print("[BMA Preview] note type not eligible; removing existing preview root if present")
         editor.web.eval(
             """
         var area = document.getElementById('root-react');
@@ -244,10 +261,10 @@ if __name__ != "__main__":
     
     def on_profile_loaded():
         """Called when user profile is loaded"""
+        mw.addonManager.setWebExports(__name__, r"(dist|preview)/.*\.(css|js|woff2?|ttf)")
         setup_custom_note_types()
         add_folder_to_media(DIST_DIRECTORY, overwrite=True)
         add_folder_to_media(PREVIEW_DIRECTORY, overwrite=True)
     
     # Hook into Anki's profile loading
     gui_hooks.profile_did_open.append(on_profile_loaded)
-

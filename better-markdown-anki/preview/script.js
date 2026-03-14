@@ -1,6 +1,6 @@
-var jsLocal = '_better_markdown_anki.js';
+var jsLocal = '/_addons/{ADDON_PACKAGE}/dist/_better_markdown_anki.js';
 var jsCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/better-markdown-anki/dist/_better_markdown_anki.js';
-var cssLocal = '_better_markdown_anki.css';
+var cssLocal = '/_addons/{ADDON_PACKAGE}/dist/_better_markdown_anki.css';
 var cssCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/better-markdown-anki/dist/_better_markdown_anki.css';
 // Load CSS
 function loadCSS(href, fallback) {
