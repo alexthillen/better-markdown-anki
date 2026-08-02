@@ -1,0 +1,420 @@
+[
+  {
+    "file": "mml-book-chapter11 (1).apkg",
+    "decks": {
+      "1": "Default",
+      "3520788808": "mml-book-chapter11"
+    },
+    "notes": [
+      {
+        "id": 1,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "What is the mathematical definition of a **Gaussian Mixture Model (GMM)** with $K$ components for a data point $x$?",
+          "Back": "A GMM is a density model defined as a convex combination of $K$ Gaussian distributions:\n\n$$p(x | \\theta) = \\sum _ {k=1}^{K} \\pi _ k \\mathcal{N}(x | \\mu _ k, \\Sigma _ k)$$\n\nsubject to the constraints:\n*   $0 \\le \\pi _ k \\le 1$\n*   $\\sum _ {k=1}^{K} \\pi _ k = 1$",
+          "Extra": "The parameters $\\pi _ k$ are known as **mixture weights**. This model is significantly more flexible than a single Gaussian because it can represent **multimodal** densities (distributions with multiple peaks or &quot;clusters&quot;).",
+          "Difficulty": "3/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 1,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "Provide a high-level algorithmic structure for the **Expectation-Maximization (EM)** algorithm as applied to GMM parameter learning.",
+          "Back": "```python\n# Initialize parameters: mu, sigma, pi\ninitialize_parameters(theta)\n\nwhile not converged:\n    # 1. E-step: Evaluate responsibilities (posterior probabilities)\n    # for each data point n and component k\n    r_nk = compute_responsibilities(X, theta)\n    \n    # 2. M-step: Re-estimate parameters using current responsibilities\n    N_k = sum(r_nk, axis=0) # Total responsibility for each component\n    mu_new = update_means(X, r_nk, N_k)\n    sigma_new = update_covariances(X, r_nk, mu_new, N_k)\n    pi_new = N_k / N\n    \n    theta = (mu_new, sigma_new, pi_new)\n```",
+          "Extra": "The EM algorithm is an iterative scheme used because there is no **closed-form solution** for the maximum likelihood estimate of a GMM. Each iteration is guaranteed to increase (or leave unchanged) the log-likelihood function.",
+          "Difficulty": "5/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 2,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "Define the **responsibility** $r _ {nk}$ in the context of a GMM and provide its formula.",
+          "Back": "The responsibility $r _ {nk}$ is the posterior probability that the $k$-th mixture component generated the $n$-th data point $x _ n$:\n\n$$rnk := \\frac{\\pi _ k \\mathcal{N}(x _ n | \\mu _ k, \\Sigma _ k)}{\\sum _ {j=1}^{K} \\pi _ j \\mathcal{N}(x _ n | \\mu _ j, \\Sigma _ j)}$$\n",
+          "Extra": "Responsibilities represent a **&quot;soft assignment&quot;** of data points to clusters. For any data point $n$, the sum of responsibilities across all components $K$ is exactly 1 ($\\sum _ k r _ {nk} = 1$).",
+          "Difficulty": "6/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 3,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "What is the **log-likelihood** function $\\mathcal{L}$ for a GMM given a dataset $\\mathcal{X} = \\{x _ 1, \\dots, x _ N\\}$ of i.i.d. observations?",
+          "Back": "\n$$\\mathcal{L}(\\theta) = \\sum _ {n=1}^{N} \\log \\left( \\sum _ {k=1}^{K} \\pi _ k \\mathcal{N}(x _ n | \\mu _ k, \\Sigma _ k) \\right)$$\n",
+          "Extra": "The presence of the sum inside the logarithm prevents us from applying the log directly to the Gaussian components. This is why we cannot find a simple closed-form solution for the parameters by setting the gradient to zero, necessitating iterative methods like **EM**.",
+          "Difficulty": "5/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 4,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "In the M-step of the EM algorithm, what is the update equation for the **mean** $\\mu _ k^{new}$ of the $k$-th component?",
+          "Back": "\n$$\\mu _ k^{new} = \\frac{\\sum _ {n=1}^{N} r _ {nk} x _ n}{\\sum _ {n=1}^{N} r _ {nk} }$$\n",
+          "Extra": "This can be interpreted as an **importance-weighted** mean of all data points, where the weight for each point $x _ n$ is the responsibility $r _ {nk}$ that the $k$-th cluster takes for that point.",
+          "Difficulty": "7/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 5,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "How is the **mixture weight** $\\pi _ k$ updated during the M-step of the EM algorithm?",
+          "Back": "\n$$\\pi _ k^{new} = \\frac{N _ k}{N}$$\n\nwhere $N _ k = \\sum _ {n=1}^{N} r _ {nk}$ is the total responsibility assigned to the $k$-th component.",
+          "Extra": "The updated weight is simply the proportion of the total &quot;responsibility mass&quot; assigned to component $k$ relative to the total number of data points $N$.",
+          "Difficulty": "4/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 6,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "Compare **Gaussian Mixture Models** and **K-means** clustering in terms of how they assign data points to clusters.",
+          "Back": "*   **K-means**: Performs **hard assignment**, where each data point belongs to exactly one cluster (the one with the nearest mean).\n*   **GMM**: Performs **soft assignment**, where each data point has a probability (responsibility) of belonging to each cluster.",
+          "Extra": "K-means can be viewed as a special case of GMM where the covariance matrices are ignored (or assumed to be $\\sigma^2 I$ with $\\sigma^2 \\to 0$), forcing the responsibilities to become binary (0 or 1).",
+          "Difficulty": "4/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 7,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "In the **latent-variable perspective** of GMMs, what is the role of the indicator variable $z$?",
+          "Back": "The variable $z \\in \\{0, 1\\}^K$ is a **one-hot encoded** vector that indicates which specific Gaussian component generated a data point $x$. \n\n*   $p(z _ k = 1) = \\pi _ k$ (Prior)\n*   $p(x | z _ k = 1) = \\mathcal{N}(x | \\mu _ k, \\Sigma _ k)$ (Conditional Likelihood)",
+          "Extra": "This perspective allows us to treat the GMM as a generative process: first, we sample a component $k$ according to the probabilities $\\pi$, and then we sample the observation $x$ from that specific Gaussian.",
+          "Difficulty": "6/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 8,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "Explain the phenomenon of **singularities** (a form of overfitting) in Maximum Likelihood estimation for GMMs.",
+          "Back": "A singularity occurs if the mean of one mixture component $\\mu _ k$ is placed exactly on a data point $x _ n$ and the corresponding covariance $\\Sigma _ k$ shrinks toward zero. In this case, the likelihood $p(x _ n | \\mu _ k, \\Sigma _ k)$ approaches **infinity**.",
+          "Extra": "This is a major criticism of Maximum Likelihood for GMMs. In practice, this is often avoided by detecting when a variance becomes too small and resetting it, or by using a Bayesian approach with priors on the parameters.",
+          "Difficulty": "8/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 9,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "model": "SnapDeck : Basic",
+        "type": "basic",
+        "fields": {
+          "Front": "What is the formula for **Kernel Density Estimation (KDE)** and what is the role of the parameter $h$?",
+          "Back": "\n$$p(x) = \\frac{1}{Nh} \\sum _ {n=1}^{N} k\\left(\\frac{x - x _ n}{h}\\right)$$\n\n*   $k$ is the **kernel function** (e.g., a Gaussian).\n*   $h &gt; 0$ is the **smoothing** or **bandwidth** parameter.",
+          "Extra": "KDE is a non-parametric method. Unlike GMMs, which use a fixed number of components $K$, KDE effectively places a small &quot;kernel&quot; distribution over **every** data point in the dataset. $h$ controls the trade-off between overfitting (small $h$, very spikey) and underfitting (large $h$, too smooth).",
+          "Difficulty": "8/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 10,
+            "deckId": "3520788808",
+            "ordinal": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "mml-book-chapter11.apkg",
+    "decks": {
+      "1": "Default",
+      "9664169712": "mml-book-chapter11"
+    },
+    "notes": [
+      {
+        "id": 1,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "A **Gaussian Mixture Model (GMM)** is a density model formed by a {{c1::convex combination}} of $K$ Gaussian distributions:\n\n{{c2::\n$$p(x | \\theta) = \\sum _ {k=1}^K \\pi _ k \\mathcal{N}(x | \\mu _ k, \\Sigma _ k)$$\n::\n$$p(x | \\theta) = ...$$\n}}",
+          "Back Extra": "The parameters $\\pi _ k$ are known as **mixture weights**. To ensure the model represents a valid probability density, they must satisfy $0 \\le \\pi _ k \\le 1$ and $\\sum _ {k=1}^K \\pi _ k = 1$.",
+          "Difficulty": "3/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 1,
+            "deckId": "9664169712",
+            "ordinal": 0
+          },
+          {
+            "id": 2,
+            "deckId": "9664169712",
+            "ordinal": 1
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "In the context of GMMs, the quantity {{c1::responsibility}} ($r _ {nk}$) represents the {{c2::posterior probability}} that the $k$-th mixture component generated the $n$-th data point $x _ n$.",
+          "Back Extra": "Mathematically, it is defined using Bayes&#x27; Theorem:\n$$r _ {nk} := p(z _ k = 1 | x _ n) = \\frac{\\pi _ k \\mathcal{N}(x _ n | \\mu _ k, \\Sigma _ k)}{\\sum _ {j=1}^K \\pi _ j \\mathcal{N}(x _ n | \\mu _ j, \\Sigma _ j)}$$\nIt provides a &quot;soft assignment&quot; of data points to clusters.",
+          "Difficulty": "5/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 3,
+            "deckId": "9664169712",
+            "ordinal": 0
+          },
+          {
+            "id": 4,
+            "deckId": "9664169712",
+            "ordinal": 1
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "The **Expectation-Maximization (EM) algorithm** for GMMs is an iterative scheme consisting of two main steps:\n\n1.  **E-step**: Evaluate the {{c1::responsibilities $r _ {nk}$}} for every data point using current parameters.\n2.  **M-step**: Reestimate the {{c2::parameters ($\\mu _ k, \\Sigma _ k, \\pi _ k$)}} by maximizing the expected log-likelihood.",
+          "Back Extra": "The EM algorithm is used because the log-likelihood of a GMM does not have a closed-form maximum likelihood solution. Each iteration of EM is guaranteed to increase the log-likelihood.",
+          "Difficulty": "4/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 5,
+            "deckId": "9664169712",
+            "ordinal": 0
+          },
+          {
+            "id": 6,
+            "deckId": "9664169712",
+            "ordinal": 1
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "Maximum likelihood estimation for GMMs lacks a **closed-form solution** because the {{c1::logarithm}} in the log-likelihood function cannot be moved inside the {{c2::summation over the $K$ components}}.",
+          "Back Extra": "The log-likelihood is given by:\n$$\\mathcal{L} = \\sum _ {n=1}^N \\log \\left( \\sum _ {k=1}^K \\pi _ k \\mathcal{N}(x _ n | \\mu _ k, \\Sigma _ k) \\right)$$\nBecause of the &quot;log-of-sum&quot; structure, setting the gradient to zero results in a set of dependent simultaneous equations that must be solved iteratively.",
+          "Difficulty": "6/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 7,
+            "deckId": "9664169712",
+            "ordinal": 0
+          },
+          {
+            "id": 8,
+            "deckId": "9664169712",
+            "ordinal": 1
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "In the M-step of the EM algorithm, the updated **mean** $\\mu _ k^{new}$ for the $k$-th component is calculated as:\n\n{{c1::\n$$\\mu _ k^{new} = \\frac{\\sum _ {n=1}^N r _ {nk} x _ n}{\\sum _ {n=1}^N r _ {nk} }$$\n::\n$$\\mu _ k^{new} = ...$$\n}}",
+          "Back Extra": "This can be interpreted as an **importance-weighted** average of the data points, where the weights are the responsibilities $r _ {nk}$. The denominator $N _ k = \\sum _ {n=1}^N r _ {nk}$ represents the total responsibility assigned to component $k$.",
+          "Difficulty": "6/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 9,
+            "deckId": "9664169712",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "In the **latent-variable perspective** of GMMs, we assume each data point $x _ n$ is associated with a binary indicator vector $z _ n \\in \\{0, 1\\}^K$ that uses a {{c1::one-hot encoding::type of representation}} to specify which component generated the point.",
+          "Back Extra": "In this view, $z$ is a latent variable because we do not observe which component generated which data point. The responsibility $r _ {nk}$ is then the posterior probability $p(z _ {nk}=1 | x _ n)$.",
+          "Difficulty": "7/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 10,
+            "deckId": "9664169712",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "While **K-means** clustering makes a {{c1::&quot;hard&quot; assignment}} of data points to clusters, **Gaussian Mixture Models** perform a {{c2::&quot;soft&quot; assignment}} via responsibilities.",
+          "Back Extra": "K-means can be viewed as a non-probabilistic limit of GMMs where we ignore the covariances (or set them to the identity matrix $I$) and only consider the closest cluster center for each point.",
+          "Difficulty": "4/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 11,
+            "deckId": "9664169712",
+            "ordinal": 0
+          },
+          {
+            "id": 12,
+            "deckId": "9664169712",
+            "ordinal": 1
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "The update equation for the **mixture weights** $\\pi _ k$ in the M-step is:\n\n{{c1::\n$$\\pi _ k^{new} = \\frac{N _ k}{N}$$\n::\n$$\\pi _ k^{new} = ...$$\n}}",
+          "Back Extra": "Here, $N _ k = \\sum _ {n=1}^N r _ {nk}$ is the total responsibility of the $k$-th cluster, and $N$ is the total number of data points. This represents the relative importance or &quot;prior probability&quot; of each component in the mixture.",
+          "Difficulty": "5/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 13,
+            "deckId": "9664169712",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "The M-step update for the **covariance matrix** $\\Sigma _ k$ of a GMM is:\n\n{{c1::\n$$\\Sigma _ k^{new} = \\frac{1}{N _ k} \\sum _ {n=1}^N r _ {nk} (x _ n - \\mu _ k)(x _ n - \\mu _ k)^\\top$$\n::\n$$\\Sigma _ k^{new} = ...$$\n}}",
+          "Back Extra": "This formula is analogous to the standard empirical covariance, but it weights each squared deviation by the probability ($r _ {nk}$) that the data point $x _ n$ actually belongs to component $k$.",
+          "Difficulty": "8/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 14,
+            "deckId": "9664169712",
+            "ordinal": 0
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "model": "SnapDeck : Cloze",
+        "type": "cloze",
+        "fields": {
+          "Text": "**Kernel Density Estimation (KDE)** is a {{c1::nonparametric}} density estimation technique that represents the distribution by placing a {{c2::kernel function}} $k$ on **every** single data point $x _ n$.",
+          "Back Extra": "The KDE formula is:\n$$p(x) = \\frac{1}{Nh} \\sum _ {n=1}^N k\\left(\\frac{x - x _ n}{h}\\right)$$\nwhere $h$ is the **smoothing/bandwidth** parameter. Unlike GMMs, KDE does not require choosing a fixed number of clusters $K$ beforehand, but its computational cost scales with the number of data points $N$.",
+          "Difficulty": "7/10"
+        },
+        "tags": [],
+        "cards": [
+          {
+            "id": 15,
+            "deckId": "9664169712",
+            "ordinal": 0
+          },
+          {
+            "id": 16,
+            "deckId": "9664169712",
+            "ordinal": 1
+          }
+        ]
+      }
+    ]
+  }
+]

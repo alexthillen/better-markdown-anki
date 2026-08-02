@@ -14,13 +14,55 @@
 
 
 .cloze {
-    color:rgb(0, 213, 114) !important;
+    color: #0b8f6a !important;
     font-weight: bold;
 }
 
 .cloze * {
     color: inherit !important;
     font-weight: inherit !important;
+}
+
+.bma-cloze-index {
+    display: inline-block;
+    margin-left: 0.35em;
+    min-width: 1.45em;
+    padding: 0.08em 0.3em;
+    border: 1px solid #a5b4c7;
+    border-radius: 999px;
+    color: #344054 !important;
+    background: #f2f4f7;
+    font: 700 0.58em/1.2 system-ui, sans-serif !important;
+    text-align: center;
+    vertical-align: 0.15em;
+}
+
+.bma-cloze-toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15em;
+}
+
+.bma-cloze-toggle-label .bma-cloze-index {
+    margin-left: 0;
+    font-size: 0.8em !important;
+}
+
+.bma-cloze-code-line {
+    border-radius: 0.2em;
+    background: color-mix(in srgb, #0b8f6a 12%, transparent);
+}
+
+.bma-cloze-code-line,
+.bma-cloze-code-line * {
+    color: #0b8f6a !important;
+    font-weight: 700 !important;
+}
+
+.bma-cloze-code-line .bma-cloze-code-index {
+    margin: 0 0.35em;
+    color: #344054 !important;
+    font-size: 0.75em !important;
 }
 
 #qa:empty {
