@@ -6,6 +6,10 @@ import { Button } from '@mantine/core';
 import IconCoffee from '@tabler/icons-react/dist/esm/icons/IconCoffee.mjs';
 import { TagsAndDifficulty } from './components/Tags';
 
+const BASIC_IDS = ['front-card-basic', 'back-card-basic', 'extra-card-basic'];
+const CLOZE_IDS = ['front-card-cloze', 'back-card-cloze', 'extra-card-cloze'];
+const TAG_IDS = ['tags-card', 'tags-card-basic', 'tags-card-cloze'];
+const DIFFICULTY_IDS = ['difficulty-card', 'difficulty-card-basic', 'difficulty-card-cloze'];
 
 function App() {
     const { colorScheme } = useMantineColorScheme();
@@ -13,11 +17,6 @@ function App() {
     /*-------------------------------------------------------------------
    * Theme-aware color configuration
    *------------------------------------------------------------------*/
-
-    const basicIds = ['front-card-basic', 'back-card-basic', 'extra-card-basic'];
-    const clozeIds = ['front-card-cloze', 'back-card-cloze', 'extra-card-cloze'];
-    const tagsIds = ['tags-card', 'tags-card-basic', 'tags-card-cloze'];
-    const difficultyIds = ['difficulty-card', 'difficulty-card-basic', 'difficulty-card-cloze'];
 
     const [basicNodes, setBasicNodes] = useState({ front: null, back: null, extra: null });
     const [clozeNodes, setClozeNodes] = useState({ front: null, back: null, extra: null, contentVersion: 0 });
@@ -50,10 +49,10 @@ function App() {
 
     // Use useEffect to check DOM once and set state
     useEffect(() => {
-        const basicElements = basicIds.map(id => document.getElementById(id));
-        const clozeElements = clozeIds.map(id => document.getElementById(id));
-        const tagElement = tagsIds.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
-        const difficultyElement = difficultyIds.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
+        const basicElements = BASIC_IDS.map(id => document.getElementById(id));
+        const clozeElements = CLOZE_IDS.map(id => document.getElementById(id));
+        const tagElement = TAG_IDS.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
+        const difficultyElement = DIFFICULTY_IDS.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
 
 
         setBasicNodes({
@@ -74,7 +73,7 @@ function App() {
         setTriggerBuyMeACoffee(prev => prev + 1);
 
         const observer = new MutationObserver((mutationsList) => {
-            const relevantIds = [...basicIds, ...clozeIds];
+            const relevantIds = [...BASIC_IDS, ...CLOZE_IDS];
             const hasRelevantMutation = mutationsList.some(({ target, addedNodes, removedNodes }) => {
                 const hasRelevantAncestor = (node) => {
                     if (!node) return false;
@@ -99,10 +98,10 @@ function App() {
 
             if (!hasRelevantMutation) return;
 
-            const updatedBasicElements = basicIds.map(id => document.getElementById(id));
-            const updatedClozeElements = clozeIds.map(id => document.getElementById(id));
-            const updatedTagsElement = tagsIds.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
-            const updatedDifficultyElement = difficultyIds.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
+            const updatedBasicElements = BASIC_IDS.map(id => document.getElementById(id));
+            const updatedClozeElements = CLOZE_IDS.map(id => document.getElementById(id));
+            const updatedTagsElement = TAG_IDS.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
+            const updatedDifficultyElement = DIFFICULTY_IDS.map(id => document.getElementById(id)).filter((el) => el !== null)[0];
 
             setBasicNodes({
                 front: updatedBasicElements[0],

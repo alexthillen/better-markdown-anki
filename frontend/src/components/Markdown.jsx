@@ -8,12 +8,13 @@ import remarkGfm from 'remark-gfm'; // Added for table support
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { createElement as createSyntaxElement, Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import {
     oneDark,
     oneLight,
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import 'katex/dist/katex.min.css';
+import ClozeIndexBadge from './ClozeIndexBadge';
 
 // Function to decode HTML entities
 const decodeHtmlEntities = (text) => {
@@ -35,7 +36,7 @@ function decodeMarkdownMathContent(markdownText) {
         let processedContent = content.replace(/<br\s*\/?>/gi, '\n');
         processedContent = decodeHtmlEntities(processedContent);
         if (dollarContent !== undefined) {
-            return `$$${processedContent}$$`;
+            return `\n$$\n${processedContent}\n$$\n`;
         } else {
             return `\\[${processedContent}\\]`;
         }
@@ -89,6 +90,71 @@ const createSanitizationSchema = () => {
     };
 };
 
+const colorIndexedBlockMath = () => (tree) => {
+    const containsIndexedBlock = (node) => (
+        node.type === 'element' && node.properties?.dataClozeBlock
+        || node.children?.some(containsIndexedBlock)
+    );
+
+    const visit = (node) => {
+        if (!node.children) return;
+
+        let indexedBlock = false;
+        node.children.forEach((child) => {
+            if (containsIndexedBlock(child)) {
+                indexedBlock = true;
+                return;
+            }
+            if (indexedBlock && child.type === 'text' && !child.value.trim()) return;
+
+            const classes = child.type === 'element' ? child.properties?.className : null;
+            if (indexedBlock && Array.isArray(classes) && classes.includes('katex-display')) {
+                classes.push('cloze');
+            }
+            indexedBlock = false;
+        });
+        node.children.forEach(visit);
+    };
+
+    visit(tree);
+};
+
+const CLOZE_CODE_MARKER = /BMA_CLOZE_INDEX_(\d+)_/g;
+
+function decorateCodeMarkers(node) {
+    if (!node.children) return node;
+
+    return {
+        ...node,
+        children: node.children.flatMap((child) => {
+            if (child.type !== 'text') return [decorateCodeMarkers(child)];
+
+            const parts = [];
+            let cursor = 0;
+            for (const match of child.value.matchAll(CLOZE_CODE_MARKER)) {
+                if (match.index > cursor) {
+                    parts.push({ type: 'text', value: child.value.slice(cursor, match.index) });
+                }
+                parts.push({
+                    type: 'element',
+                    tagName: 'span',
+                    properties: {
+                        className: ['bma-cloze-index', 'bma-cloze-code-index'],
+                        'aria-label': `Cloze ${match[1]}`,
+                    },
+                    children: [{ type: 'text', value: match[1] }],
+                });
+                cursor = match.index + match[0].length;
+            }
+            if (cursor === 0) return [child];
+            if (cursor < child.value.length) {
+                parts.push({ type: 'text', value: child.value.slice(cursor) });
+            }
+            return parts;
+        }),
+    };
+}
+
 const Markdown = ({
     children,
     className = '',
@@ -111,8 +177,9 @@ const Markdown = ({
     const preprocessHtmlBreaks = (content) => {
         return content
             .replace(/<br\s*\/?>/gi, '\n')
-            .replace(/<div\s*\/?>/gi, '\n') // TODO : maybe only do this in code blocks?
-            .replace(/<\/div>/gi, '\n')
+            .replace(/<\/div>\s*<div[^>]*>/gi, '\n')
+            .replace(/<div[^>]*>/gi, '\n')
+            .replace(/<\/div>/gi, '')
             .replace(/(&nbsp;)/gi, ' ');
     };
 
@@ -200,6 +267,7 @@ const Markdown = ({
                 plugins.push([rehypeSanitize, schema]);
             }
         }
+        plugins.push(colorIndexedBlockMath);
 
         return plugins;
     };
@@ -226,22 +294,26 @@ const Markdown = ({
                 remarkPlugins={[remarkMath, remarkGfm]} // Math and Table support
                 rehypePlugins={buildRehypePlugins()}
                 components={{
-                    span: ({ className, children, ...props }) => {
+                    span: ({ className, children, 'data-cloze': cloze, 'data-cloze-index': clozeIndex, 'data-ordinal': ordinal, ...props }) => {
+                        const indexBadge = clozeIndex ? <ClozeIndexBadge index={clozeIndex} /> : null;
 
 
                         if (typeof children === 'string') {
                             children = handleStringChildrenSpan(children);
-                            return <span className={className} dangerouslySetInnerHTML={{ __html: children }} {...props} />;
+                            return <span className={className} data-cloze={cloze} data-cloze-index={clozeIndex} data-ordinal={ordinal} {...props}>
+                                <span dangerouslySetInnerHTML={{ __html: children }} />
+                                {indexBadge}
+                            </span>;
                         } else if (Array.isArray(children)) {
-                            const processedChildren = children.map(child => {
+                            const processedChildren = children.map((child, index) => {
                                 if (typeof child === 'string') {
-                                    return <span dangerouslySetInnerHTML={{ __html: handleStringChildrenSpan(child) }} />;
+                                    return <span key={index} dangerouslySetInnerHTML={{ __html: handleStringChildrenSpan(child) }} />;
                                 }
                                 return child;
                             });
-                            return <span className={className} {...props}>{processedChildren}</span>;
+                            return <span className={className} data-cloze={cloze} data-cloze-index={clozeIndex} data-ordinal={ordinal} {...props}>{processedChildren}{indexBadge}</span>;
                         }
-                        return <span className={className} {...props}>{children}</span>;
+                        return <span className={className} data-cloze={cloze} data-cloze-index={clozeIndex} data-ordinal={ordinal} {...props}>{children}{indexBadge}</span>;
                     },
                     pre: ({ children, ...props }) => {
                         // Return a div instead of pre to avoid double wrapping
@@ -253,11 +325,19 @@ const Markdown = ({
                         ...props
                     }) => {
                         const match = /language-(\w+)/.exec(codeClassName || '');
-                        const codeString = String(decodeHtmlEntities(codeChildren)).replace(/^\n/, '').replace(/\n$/, '');
-                        return (<SyntaxHighlighter
+                        const rawCode = String(decodeHtmlEntities(codeChildren)).replace(/^\n/, '').replace(/\n$/, '');
+                        const clozeLines = new Set();
+                        rawCode.split('\n').forEach((line, lineIndex) => {
+                            for (const _match of line.matchAll(CLOZE_CODE_MARKER)) {
+                                clozeLines.add(lineIndex + 1);
+                            }
+                        });
+                        const codeString = rawCode;
+                        const isBlock = Boolean(match || codeString.includes('\n'));
+                        const highlightedCode = <SyntaxHighlighter
                                 style={syntaxTheme}
                                 language={(match && match[1]) || 'text'}
-                                PreTag={(match || String(codeChildren).includes('\n') ? 'div' : 'span')}
+                                PreTag={isBlock ? 'div' : 'span'}
                                 customStyle={{
                                     ...syntaxHighlighterCustomStyle,
                                 }}
@@ -270,10 +350,26 @@ const Markdown = ({
                                     }
                                 }}
                                 wrapLines
+                                showLineNumbers={clozeLines.size > 0}
+                                showInlineLineNumbers={false}
+                                lineNumberContainerStyle={{ display: 'none' }}
+                                lineProps={(lineNumber) => ({
+                                    className: clozeLines.has(lineNumber) ? 'bma-cloze-code-line' : undefined,
+                                })}
+                                renderer={({ rows, stylesheet, useInlineStyles }) => (
+                                    rows.map((row, index) => createSyntaxElement({
+                                        node: decorateCodeMarkers(row),
+                                        stylesheet,
+                                        useInlineStyles,
+                                        key: `code-line-${index}`,
+                                    }))
+                                )}
                                 {...props}
                             >
                                 {codeString}
-                            </SyntaxHighlighter>);
+                            </SyntaxHighlighter>;
+
+                        return highlightedCode;
                     },
                     img: ({ className: imgClassName, ...props }) => (
                         <img

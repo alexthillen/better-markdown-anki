@@ -79,14 +79,26 @@ The add-on creates two specialized note types:
 ## Development
 
 ```bash
-# Install dependencies
+# Install frontend dependencies
+cd frontend
 npm install
 
 # Start development server
+npm run fixtures
 npm run dev
 
-# Build for production
+# Open http://localhost:5173/deck-preview.html to inspect the imported decks
+
+# Run the automated regression suite and lint checks
+npm test
+npm run lint
+
+# Build the production assets into better-markdown-anki/dist
 npm run build
+
+# Run the add-on integration tests from the repository root
+cd ..
+python3 -m unittest discover -s tests -v
 ```
 
 ## Configuration
@@ -100,4 +112,3 @@ The add-on includes automatic configuration management:
 ## Browser Compatibility
 
 Optimized for modern browsers with support for ES2020+ features, CSS custom properties, and DOM MutationObserver API.
-

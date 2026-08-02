@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import Markdown from './Markdown';
 import { Card, Paper, Stack, Text, Switch, Group } from '@mantine/core';
 import ClozeToggle from './ClozeToggle';
+import ClozeIndexBadge from './ClozeIndexBadge';
 
 function safeDecode(str) {
     try {
@@ -17,7 +18,9 @@ function removeClozeSpans(htmlString) {
     doc.body.innerHTML = htmlString;
     const clozeSpans = doc.querySelectorAll('span.cloze, span.cloze-inactive');
     clozeSpans.forEach(span => {
-        span.outerHTML = span.innerHTML;
+        const index = span.getAttribute('data-cloze-index');
+        const marker = index ? `BMA_CLOZE_INDEX_${index}_` : '';
+        span.outerHTML = marker + span.innerHTML;
     });
     return doc.body.innerHTML;
 }
@@ -107,9 +110,24 @@ function ClozeCard(
     const root = document.getElementById('front-card-cloze');
     const clozeSpans = Array.from(root ? root.querySelectorAll('span.cloze') : []);
 
-    const nodeToMarkdown = (node: HTMLElement | null): string => {
+    const nodeToMarkdown = (node: HTMLElement | null, indexClozes = false): string => {
         if (!node) return '';
-        const res = replaceCodeContent(node.innerHTML.trim() || '');
+        const content = node.cloneNode(true) as HTMLElement;
+        if (indexClozes) {
+            content.querySelectorAll('span.cloze').forEach((span, index) => {
+                const clozeIndex = String(index + 1);
+                const blockHint = span.innerHTML.trim().match(/^\[\s*(\$\$[\s\S]*\$\$|\\\[[\s\S]*\\\])\s*\]$/);
+                if (blockHint) {
+                    const marker = document.createElement('span');
+                    marker.setAttribute('data-cloze-index', clozeIndex);
+                    marker.setAttribute('data-cloze-block', 'true');
+                    span.replaceWith(marker, document.createTextNode(`\n${blockHint[1]}\n`));
+                } else {
+                    span.setAttribute('data-cloze-index', clozeIndex);
+                }
+            });
+        }
+        const res = replaceCodeContent(content.innerHTML.trim() || '');
         const mathRes = replaceMarkdownMathContent(res);
         return mathRes;
     }
@@ -124,7 +142,7 @@ function ClozeCard(
         }
 
         setClozeCardContent({
-            front: nodeToMarkdown(frontNode),
+            front: nodeToMarkdown(frontNode, true),
             back: nodeToMarkdown(backNode),
             extra: nodeToMarkdown(extraNode)
         });
@@ -144,7 +162,7 @@ function ClozeCard(
                                 <ClozeToggle 
                                     key={index} 
                                     spanElement={span} 
-                                    label={`Cloze ${index + 1}`} 
+                                    label={<span className="bma-cloze-toggle-label">Cloze <ClozeIndexBadge index={index + 1} ariaHidden /></span>}
                                     text={symmetricConcat(
                                         safeDecode(span.getAttribute('data-cloze')), 
                                         span.innerHTML

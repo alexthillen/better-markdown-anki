@@ -6,6 +6,7 @@ import { Button } from '@mantine/core';
 import IconCoffee from '@tabler/icons-react/dist/esm/icons/IconCoffee.mjs';
 import { TagsAndDifficulty } from './components/Tags';
 import {debounce} from 'lodash';
+import { hasExternalMutation } from './previewMutations';
 
 
 
@@ -81,16 +82,21 @@ function Preview() {
         // Initial setup
         debouncedUpdateFromFields();
 
-        const observer = new MutationObserver(() => {
-            debouncedUpdateFromFields();
+        const observer = new MutationObserver((mutations) => {
+            const previewRoot = document.getElementById('root-react');
+            if (hasExternalMutation(mutations, previewRoot)) {
+                debouncedUpdateFromFields();
+            }
         });
         const observed_node = document.body.querySelector(".note-editor")
-        observer.observe(observed_node, {
-            childList: true,
-            subtree: true,
-            characterData: true,
-            attributes: true,
-        });
+        if (observed_node) {
+            observer.observe(observed_node, {
+                childList: true,
+                subtree: true,
+                characterData: true,
+                attributes: true,
+            });
+        }
 
         const handleKeyUp = () => {
             debouncedUpdateFromFields();

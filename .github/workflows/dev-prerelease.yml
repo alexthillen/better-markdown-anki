@@ -1,0 +1,80 @@
+name: Update development prerelease
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dev-prerelease
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Test frontend
+        working-directory: frontend
+        run: npm test
+
+      - name: Lint frontend
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Test add-on integration
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Embed source revision
+        run: sed -i 's/TAG = "DEV_TAG"/TAG = "${{ github.sha }}"/' better-markdown-anki/__init__.py
+
+      - name: Package add-on
+        working-directory: better-markdown-anki
+        run: zip -r ../better-markdown-anki-dev.ankiaddon . -x '*.pyc' '*__pycache__*' '.DS_Store'
+
+      - name: Update development prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: dev-latest
+          RELEASE_ASSET: better-markdown-anki-dev.ankiaddon
+        run: |
+          git tag --force "$RELEASE_TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/$RELEASE_TAG" --force
+
+          RELEASE_NOTES="Automated development build from commit [$GITHUB_SHA]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA)."
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" \
+              --title "Development build" \
+              --notes "$RELEASE_NOTES" \
+              --prerelease
+          else
+            gh release create "$RELEASE_TAG" \
+              --title "Development build" \
+              --notes "$RELEASE_NOTES" \
+              --prerelease \
+              --verify-tag
+          fi
+
+          gh release upload "$RELEASE_TAG" "$RELEASE_ASSET" --clobber

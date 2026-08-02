@@ -241,7 +241,6 @@ def update_existing_note_type(note_type_name: str, update_templates: bool = Fals
         else:  # Basic
             model['tmpls'][0]['qfmt'] = BASIC_TEMPLATE_FRONT
             model['tmpls'][0]['afmt'] = BASIC_TEMPLATE_BACK
-        model['css'] = CSS_TEMPLATE
         fields_added = True  # Mark as changed to save model
         print(f"Updated templates for note type '{note_type_name}'")
     

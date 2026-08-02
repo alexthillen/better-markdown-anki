@@ -1,10 +1,10 @@
-import { Switch, useMantineColorScheme } from '@mantine/core';
+import { Switch } from '@mantine/core';
 import React, { useEffect, useState } from 'react'
 
 function safeDecode(str) {
     try {
         return decodeURIComponent(str || '');
-    } catch (e) {
+    } catch {
         return str || '';
     }
 }
