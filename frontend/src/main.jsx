@@ -14,6 +14,7 @@ import '@mantine/code-highlight/styles.css';
 const basicIds = ['front-card-basic', 'back-card-basic', 'extra-card-basic'];
 const clozeIds = ['front-card-cloze', 'back-card-cloze', 'extra-card-cloze'];
 const isCard = [...basicIds, ...clozeIds].some(id => document.getElementById(id) !== null);
+document.body.classList.toggle('bma-review', isCard);
 
 // Document setup for React
 const oldRoot = document.getElementById('root-react')
