@@ -7,6 +7,7 @@ import IconCoffee from '@tabler/icons-react/dist/esm/icons/IconCoffee.mjs';
 import { TagsAndDifficulty } from './components/Tags';
 import {debounce} from 'lodash';
 import { hasExternalMutation } from './previewMutations';
+import { clozeHtml } from './clozeHtml';
 
 
 
@@ -62,8 +63,14 @@ function Preview() {
                 });
                 setClozeNodes({ front: '', back: '', extra: '', contentVersion: 0 });
             } else {
+                const textNode = childElements.find(el => el.label.toLowerCase().includes('text'))?.content;
+                const front = document.createElement('div');
+                const back = document.createElement('div');
+                front.innerHTML = clozeHtml(textNode?.innerHTML || '', null, 'front');
+                back.innerHTML = clozeHtml(textNode?.innerHTML || '', null, 'back');
                 const node = {
-                    front: childElements.find(el => el.label.toLowerCase().includes('text'))?.content || '',
+                    front,
+                    back,
                     extra: childElements.find(el => el.label.toLowerCase().includes('extra'))?.content || '',
                     contentVersion: Date.now()
                 }
@@ -98,12 +105,14 @@ function Preview() {
             });
         }
 
-        const handleKeyUp = () => {
+        const handleKeyUp = (event) => {
+            if (event.composedPath().includes(document.getElementById('root-react'))) return;
             debouncedUpdateFromFields();
         };
         window.addEventListener('keyup', handleKeyUp);
 
         return () => {
+            debouncedUpdateFromFields.cancel();
             observer.disconnect();
             window.removeEventListener('keyup', handleKeyUp);
         }

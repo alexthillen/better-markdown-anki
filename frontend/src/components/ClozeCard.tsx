@@ -4,15 +4,6 @@ import { Card, Paper, Stack, Text, Switch, Group } from '@mantine/core';
 import ClozeToggle from './ClozeToggle';
 import ClozeIndexBadge from './ClozeIndexBadge';
 
-function safeDecode(str) {
-    try {
-        return decodeURIComponent(str || '');
-    } catch (e) {
-        console.warn('Cloze decoding failed, using raw string:', str);
-        return str || '';
-    }
-}
-
 function removeClozeSpans(htmlString) {
     const doc = document.implementation.createHTMLDocument('');
     doc.body.innerHTML = htmlString;
@@ -99,7 +90,6 @@ function ClozeCard(
         back: 'Loading...',
         extra: 'Loading...'
     });
-    const [resetToggle, setResetToggle] = useState(0);
     
     const getBorderStyle = (borderColor) => (theme) => {
         const [colorKey, shadeStr] = borderColor.split('.');
@@ -107,8 +97,7 @@ function ClozeCard(
         return { border: `1px solid ${theme.colors[colorKey][shade]}` };
     };
 
-    const root = document.getElementById('front-card-cloze');
-    const clozeSpans = Array.from(root ? root.querySelectorAll('span.cloze') : []);
+    const clozeSpans = Array.from(frontNode ? frontNode.querySelectorAll('span.cloze') : []);
 
     const nodeToMarkdown = (node: HTMLElement | null, indexClozes = false): string => {
         if (!node) return '';
@@ -132,15 +121,7 @@ function ClozeCard(
         return mathRes;
     }
 
-    function symmetricConcat(s1, s2) {
-        return [s1, s2].sort().join('');
-    }
-
     useEffect(() => {
-        if (clozeCardContent.back !== nodeToMarkdown(backNode)) {
-            setResetToggle(prev => prev + 1); 
-        }
-
         setClozeCardContent({
             front: nodeToMarkdown(frontNode, true),
             back: nodeToMarkdown(backNode),
@@ -163,10 +144,10 @@ function ClozeCard(
                                     key={index} 
                                     spanElement={span} 
                                     label={<span className="bma-cloze-toggle-label">Cloze <ClozeIndexBadge index={index + 1} ariaHidden /></span>}
-                                    text={symmetricConcat(
-                                        safeDecode(span.getAttribute('data-cloze')), 
-                                        span.innerHTML
-                                    )} 
+                                    onToggle={() => setClozeCardContent(content => ({
+                                        ...content,
+                                        front: nodeToMarkdown(frontNode, true)
+                                    }))}
                                 />
                             ))
                         )}

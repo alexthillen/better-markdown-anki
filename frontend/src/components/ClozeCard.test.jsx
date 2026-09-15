@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core';
-import { render, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import ClozeCard from './ClozeCard';
 
@@ -48,10 +48,19 @@ function renderCard(frontHtml, backHtml = 'answer') {
 }
 
 afterEach(() => {
+    cleanup();
     document.body.innerHTML = '';
 });
 
 describe('ClozeCard', () => {
+    it('refreshes reviewer toggles without a document mutation observer', async () => {
+        const container = renderCard('<span class="cloze" data-cloze="answer">[hint]</span>');
+        await waitFor(() => expect(container.querySelector('.markdown-content')?.textContent).toContain('[hint]'));
+        fireEvent.click(container.querySelector('input[role="switch"]'));
+        expect(container.querySelector('.markdown-content').textContent).toContain('answer');
+        fireEvent.click(container.querySelector('input[role="switch"]'));
+        expect(container.querySelector('.markdown-content').textContent).toContain('[hint]');
+    });
     it('keeps a cleaned block-math hint inside its colored cloze', async () => {
         const container = renderCard(
             '<span class="cloze" data-cloze="answer">[\n$$x = ...$$\n]</span>',

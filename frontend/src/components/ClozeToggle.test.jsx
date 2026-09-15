@@ -18,7 +18,7 @@ describe('ClozeToggle', () => {
         span.innerHTML = '[hint]';
         const { getByRole } = render(
             <MantineProvider>
-                <ClozeToggle spanElement={span} label="Cloze 2" text="answer[hint]" />
+                <ClozeToggle spanElement={span} label="Cloze 2" />
             </MantineProvider>,
         );
 
