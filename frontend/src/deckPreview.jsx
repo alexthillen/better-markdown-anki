@@ -4,27 +4,11 @@ import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import './index.css';
 import App from './App';
+import { clozeHtml } from './clozeHtml';
 import decks from './fixtures/deck-fixtures.json';
 import { clozeCodeDeck, clozeIdDeck, mediaDeck } from './mediaDeck';
 
 const previewDecks = [...decks, mediaDeck, clozeIdDeck, clozeCodeDeck];
-
-function clozeHtml(text, ordinal, side) {
-    return text.replace(/{{c(\d+)::([\s\S]*?)}}/g, (_match, number, body) => {
-        const separator = body.indexOf('::');
-        const answer = separator === -1 ? body : body.slice(0, separator);
-        const hint = separator === -1 ? '' : body.slice(separator + 2);
-        const active = Number(number) === ordinal + 1;
-        if (!active) {
-            return `<span class="cloze-inactive" data-ordinal="${number}">${answer}</span>`;
-        }
-        if (side === 'back') {
-            return `<span class="cloze" data-ordinal="${number}">${answer}</span>`;
-        }
-        const placeholder = hint ? `[${hint}]` : '[...]';
-        return `<span class="cloze" data-cloze="${encodeURIComponent(answer)}" data-ordinal="${number}">${placeholder}</span>`;
-    });
-}
 
 function sourceNode(id, content) {
     const node = document.createElement('div');

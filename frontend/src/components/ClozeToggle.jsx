@@ -9,12 +9,12 @@ function safeDecode(str) {
     }
 }
 
-function ClozeToggle({ spanElement, label, text }) {
+function ClozeToggle({ spanElement, label, onToggle }) {
     const [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
         setIsActive(false);
-    }, [text]);
+    }, [spanElement]);
 
     const toggleCloze = (spanElement) => {
         const currentDataCloze = safeDecode(spanElement.getAttribute('data-cloze'));
@@ -30,6 +30,7 @@ function ClozeToggle({ spanElement, label, text }) {
             onChange={(event) => {
                 setIsActive(event.currentTarget.checked);
                 toggleCloze(spanElement);
+                onToggle?.();
             }}
             label={label}
         />

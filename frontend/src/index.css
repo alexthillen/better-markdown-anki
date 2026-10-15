@@ -77,7 +77,8 @@
     display: none !important;
 }
 
-main {
+/* Keep the web review spacing workaround out of Anki's editor layout. */
+body.bma-review main {
     min-height: 0px !important;
     max-height: 10vh;
 }
