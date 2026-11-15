@@ -17,12 +17,12 @@ class PackageTest(unittest.TestCase):
             package.package(output, 'v1.2.3')
             with zipfile.ZipFile(output) as archive:
                 names = archive.namelist()
-                for expected in ('__init__.py', 'mcp_server.py', 'markdown_validation.py', 'codex_setup.py', 'card_guidance.py', 'config.json', 'manifest.json', 'dist/_better_markdown_anki.js'):
+                for expected in ('__init__.py', 'mcp_server.py', 'markdown_validation.py', 'codex_setup.py', 'claude_setup.py', 'card_guidance.py', 'config.json', 'manifest.json', 'dist/_better_markdown_anki.js', 'guide/index.html', 'guide/script.js'):
                     self.assertIn(expected, names)
                 self.assertFalse(any('__pycache__' in name or name.endswith('.pyc') for name in names))
                 self.assertEqual(json.loads(archive.read('manifest.json'))['version'], '1.2.3')
                 config = json.loads(archive.read('config.json'))
-                self.assertFalse(config['mcp_enabled'])
+                self.assertTrue(config['mcp_enabled'])
                 self.assertIn(b'TAG = "v1.2.3"', archive.read('__init__.py'))
                 guide = archive.read('card_guidance.py').decode().lower()
                 self.assertIn('do not assume a deck structure', guide)
@@ -45,6 +45,7 @@ class PackageTest(unittest.TestCase):
                 package.package(output, 'v1')
             with zipfile.ZipFile(output) as archive:
                 self.assertEqual(set(archive.namelist()), {
-                    '__init__.py', 'dist/_better_markdown_anki.js', 'preview/script.js'})
+                    '__init__.py', 'dist/_better_markdown_anki.js', 'preview/script.js',
+                    *('guide/' + name for name in package.GUIDE_FILES)})
 
 if __name__ == '__main__': unittest.main()

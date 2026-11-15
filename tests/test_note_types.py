@@ -106,6 +106,160 @@ class NoteTypeUpdatesTest(unittest.TestCase):
 
 
 class CodexConnectionActionTest(unittest.TestCase):
+    def test_tools_actions_use_consistent_names(self):
+        addon, mw = load_addon()
+        qt = types.ModuleType('aqt.qt')
+        qt.QAction = Mock(side_effect=lambda *args: Mock())
+        sys.modules['aqt.qt'] = qt
+        addon.install_codex_action()
+        labels = [call.args[0] for call in qt.QAction.call_args_list]
+        self.assertEqual(labels, [
+            'Better Anki Markdown: Connect Codex',
+            'Better Anki Markdown: Enable MCP',
+            'Better Anki Markdown: Connect Claude',
+            "Better Anki Markdown: What's new",
+        ])
+
+    def test_revised_notice_schedules_when_previous_notice_was_seen(self):
+        addon, mw = load_addon()
+        mw.addonManager.getConfig.return_value = {'mcp_update_notice_seen': True}
+        qt = types.ModuleType('aqt.qt')
+        qt.QTimer = Mock()
+        sys.modules['aqt.qt'] = qt
+        addon.maybe_show_upgrade_notice(True)
+        qt.QTimer.singleShot.assert_called_once()
+
+    def test_notice_can_be_opened_from_menu_after_it_was_seen(self):
+        addon, mw = load_addon()
+        mw.addonManager.getConfig.return_value = {'mcp_update_notice_v2_seen': True}
+        qt = types.ModuleType('aqt.qt')
+        qt.QMessageBox = Mock()
+        qt.QMessageBox.ButtonRole.ActionRole = 1
+        qt.QMessageBox.ButtonRole.RejectRole = 2
+        sys.modules['aqt.qt'] = qt
+        dialog = qt.QMessageBox.return_value
+        dialog.addButton.side_effect = [object(), object(), object(), object()]
+        dialog.clickedButton.return_value = None
+        addon.show_upgrade_notice(force=True)
+        dialog.exec.assert_called_once()
+
+    def test_upgrade_notice_is_shown_once_and_connects_only_on_request(self):
+        addon, mw = load_addon()
+        config = {'mcp_enabled': True}
+        mw.addonManager.getConfig.return_value = config
+        qt = types.ModuleType('aqt.qt')
+        qt.QTimer = Mock()
+        qt.QMessageBox = Mock()
+        qt.QMessageBox.ButtonRole.ActionRole = 1
+        qt.QMessageBox.ButtonRole.RejectRole = 2
+        sys.modules['aqt.qt'] = qt
+        addon.connect_codex = Mock()
+        addon._mcp_server = Mock()
+        addon.maybe_show_upgrade_notice(True)
+        addon.maybe_show_upgrade_notice(True)
+        qt.QTimer.singleShot.assert_called_once()
+        dialog = qt.QMessageBox.return_value
+        connect, claude, guide, later = object(), object(), object(), object()
+        dialog.addButton.side_effect = [connect, claude, guide, later]
+        dialog.clickedButton.return_value = connect
+        qt.QTimer.singleShot.call_args.args[1]()
+        self.assertTrue(config['mcp_update_notice_v2_seen'])
+        self.assertIn('MCP is running', dialog.setText.call_args.args[0])
+        addon.connect_codex.assert_called_once()
+        addon.maybe_show_upgrade_notice(True)
+        qt.QTimer.singleShot.assert_called_once()
+
+    def test_fresh_install_skips_upgrade_notice(self):
+        addon, mw = load_addon()
+        config = {'mcp_enabled': False}
+        mw.addonManager.getConfig.return_value = config
+        addon.maybe_show_upgrade_notice(False)
+        self.assertTrue(config['mcp_update_notice_v2_seen'])
+        mw.addonManager.writeConfig.assert_called_once_with(addon.__name__, config)
+
+    def test_notice_explains_disabled_server(self):
+        addon, mw = load_addon()
+        config = {'mcp_enabled': False}
+        mw.addonManager.getConfig.return_value = config
+        qt = types.ModuleType('aqt.qt')
+        qt.QMessageBox = Mock()
+        qt.QMessageBox.ButtonRole.ActionRole = 1
+        qt.QMessageBox.ButtonRole.RejectRole = 2
+        sys.modules['aqt.qt'] = qt
+        dialog = qt.QMessageBox.return_value
+        dialog.addButton.side_effect = [object(), object(), object(), object()]
+        dialog.clickedButton.return_value = None
+        addon.connect_codex = Mock()
+        addon.show_upgrade_notice()
+        self.assertIn('currently disabled', dialog.setText.call_args.args[0])
+        addon.connect_codex.assert_not_called()
+
+    def test_claude_notice_button_runs_only_claude_setup(self):
+        addon, mw = load_addon()
+        config = {'mcp_enabled': True}
+        mw.addonManager.getConfig.return_value = config
+        qt = types.ModuleType('aqt.qt')
+        qt.QMessageBox = Mock()
+        qt.QMessageBox.ButtonRole.ActionRole = 1
+        qt.QMessageBox.ButtonRole.RejectRole = 2
+        sys.modules['aqt.qt'] = qt
+        dialog = qt.QMessageBox.return_value
+        codex, claude, guide, later = object(), object(), object(), object()
+        dialog.addButton.side_effect = [codex, claude, guide, later]
+        dialog.clickedButton.return_value = claude
+        addon.connect_claude = Mock()
+        addon.connect_codex = Mock()
+        addon.show_upgrade_notice()
+        addon.connect_claude.assert_called_once()
+        addon.connect_codex.assert_not_called()
+
+    def test_guide_button_opens_guide_without_configuring_clients(self):
+        addon, mw = load_addon()
+        mw.addonManager.getConfig.return_value = {}
+        qt = types.ModuleType('aqt.qt')
+        qt.QMessageBox = Mock()
+        qt.QMessageBox.ButtonRole.ActionRole = 1
+        qt.QMessageBox.ButtonRole.RejectRole = 2
+        sys.modules['aqt.qt'] = qt
+        dialog = qt.QMessageBox.return_value
+        codex, claude, guide, later = object(), object(), object(), object()
+        dialog.addButton.side_effect = [codex, claude, guide, later]
+        dialog.clickedButton.return_value = guide
+        addon.connect_codex, addon.connect_claude, addon.open_setup_guide = Mock(), Mock(), Mock()
+        addon.show_upgrade_notice()
+        addon.open_setup_guide.assert_called_once()
+        addon.connect_codex.assert_not_called()
+        addon.connect_claude.assert_not_called()
+
+    def test_claude_action_configures_on_background_thread(self):
+        addon, mw = load_addon()
+        addon.ensure_mcp_running = Mock(return_value=True)
+        addon._mcp_server = Mock(port=19176)
+        addon.configure_claude = Mock()
+        utils = types.ModuleType('aqt.utils')
+        utils.showInfo, utils.showWarning = Mock(), Mock()
+        sys.modules['aqt.utils'] = utils
+        addon.connect_claude()
+        worker, callback = mw.taskman.run_in_background.call_args.args
+        worker()
+        addon.configure_claude.assert_called_once_with(19176)
+        callback(Mock(result=Mock(return_value=None)))
+        utils.showInfo.assert_called_once()
+        utils.showWarning.assert_not_called()
+
+    def test_server_defaults_on_and_respects_explicit_disable(self):
+        addon, mw = load_addon()
+        mw.addonManager.getConfig.return_value = {}
+        addon.MCPServer = Mock()
+        addon.start_mcp_server()
+        addon.MCPServer.assert_called_once_with(mw, 19176)
+        addon.MCPServer.return_value.start.assert_called_once()
+        addon.stop_mcp_server()
+        addon.MCPServer.reset_mock()
+        mw.addonManager.getConfig.return_value = {'mcp_enabled': False}
+        addon.start_mcp_server()
+        addon.MCPServer.assert_not_called()
+
     def test_general_connection_enables_server_without_configuring_codex(self):
         addon, mw = load_addon()
         mw.col = Mock()

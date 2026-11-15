@@ -18,3 +18,8 @@ python3 website/build.py
 
 The site has no external runtime assets or dependencies. Reference links lead
 to external documentation only when selected.
+
+Publishing a non-prerelease GitHub release builds and deploys the site to
+GitHub Pages after the add-on package succeeds. Release tags must start with
+`v` followed by a digit (for example, `v1.2.3`), matching the Pages environment's
+deployment rule.

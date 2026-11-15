@@ -14,13 +14,18 @@ const examples = [
 const escapeHtml = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 function cardDocument(item) {
   const base = new URL('.', document.baseURI).href;
-  const addon = new URL('addon/', base).href;
+  const filePreview = location.protocol === 'file:';
+  const sourceFile = filePreview && new URL(base).pathname.endsWith('/website/');
+  const addon = new URL(base.includes('/_addons/') ? '../dist/' : sourceFile ? '../better-markdown-anki/dist/' : 'addon/', base).href;
+  const css = filePreview ? '_better_markdown_anki_mobile.css' : '_better_markdown_anki.css';
+  const js = filePreview ? '_better_markdown_anki_mobile.js' : '_better_markdown_anki.js';
+  const moduleType = filePreview ? '' : ' type="module"';
   const front = item.cloze
     ? 'A triangle has <span class="cloze" data-cloze="three" data-ordinal="1">[number of]</span> sides.'
     : escapeHtml(item.front || item.source);
   const back = item.back ? `<div id="back-card-basic">${escapeHtml(item.back)}</div>` : '';
   const field = item.cloze ? 'front-card-cloze' : 'front-card-basic';
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="${escapeHtml(base)}"><link rel="stylesheet" href="${escapeHtml(addon)}_better_markdown_anki.css"><style>body{margin:0;background:#1a1b1e;color:#c1c2c5}#root-react{margin:0!important}</style></head><body class="card nightMode"><div id="${field}">${front}</div>${back}<div id="tags-card"></div><div id="difficulty-card"></div><script type="module" src="${escapeHtml(addon)}_better_markdown_anki.js"><\/script></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="${escapeHtml(base)}"><link rel="stylesheet" href="${escapeHtml(addon + css)}"><style>body{margin:0;background:#1a1b1e;color:#c1c2c5}#root-react{margin:0!important}</style></head><body class="card nightMode"><div id="${field}">${front}</div>${back}<div id="tags-card"></div><div id="difficulty-card"></div><script${moduleType} src="${escapeHtml(addon + js)}" onerror="document.body.textContent='Preview unavailable. Open the guide through its local server to load the card renderer.'"><\/script></body></html>`;
 }
 
 // The preview uses the real add-on, so size the iframe to its rendered card

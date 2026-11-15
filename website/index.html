@@ -42,15 +42,18 @@
     <section id="how-it-works" class="how section-pad"><div class="container"><div class="section-heading"><div><p class="kicker"><span>02</span> THE WORKFLOW</p><h2>Familiar input.<br><em>Thoughtful output.</em></h2></div><p>Keep writing in Anki. The add-on takes care of the presentation.</p></div><div class="workflow"><article><span class="step-number">01 <span>↘</span></span><div class="step-icon">✎</div><h3>Write your note</h3><p>Choose a Better Markdown note type. Add a question, answer, and any useful context.</p></article><article><span class="step-number">02 <span>↘</span></span><div class="step-icon">{ }</div><h3>Use your syntax</h3><p>Mix Markdown with code fences, KaTeX math, tables, and cloze deletions.</p></article><article><span class="step-number">03 <span>↗</span></span><div class="step-icon">✳</div><h3>Review in context</h3><p>Preview the result in the editor, then review the rendered card in Anki.</p></article></div><div class="note-types"><div><span class="kicker-inline">TWO NOTE TYPES</span><strong>Pick the shape that fits.</strong></div><div><span class="type-pill">01</span><span><b>Basic</b><small>Front · Back · Extra</small></span></div><div><span class="type-pill alt">02</span><span><b>Cloze</b><small>Text · Back Extra</small></span></div></div></div></section>
     <section id="setup" class="setup section-pad"><div class="container"><div class="section-heading"><div><p class="kicker"><span>03</span> GET SET UP</p><h2>Set up <em>the add-on.</em></h2></div><p>Start with the add-on. Connect an AI assistant only if you need one.</p></div><div class="setup-grid"><article class="setup-card"><div class="setup-card-top"><span>01 / INSTALL</span><span>↗</span></div><h3>Add it to Anki</h3><p>In Anki Desktop, open <b>Tools → Add-ons → Get Add-ons</b>, enter the code, and restart Anki.</p><div class="copy-box"><code>2100166052</code><button class="copy-button" type="button" data-copy="2100166052">Copy code <span>↗</span></button></div><p class="fine-print">Alternatively, install a <code>.ankiaddon</code> file via <b>Tools → Add-ons → Install from file</b>. The add-on creates the Better Markdown note types when Anki starts.</p><a href="https://ankiweb.net/shared/info/2100166052">View add-on on AnkiWeb ↗</a></article><article class="setup-card mcp-card">
   <div class="setup-card-top"><span>02 / OPTIONAL</span><span>✳</span></div>
-  <h3>Connect Codex</h3>
-  <p>Connect Codex to Better Markdown while your Anki profile is open.</p>
+  <h3>Connect an AI assistant</h3>
+  <p>Connect Codex or Claude Code while your Anki profile is open.</p>
   <ol>
-    <li>In Anki, select <b>Tools → Connect Better Markdown to Codex</b>.</li>
+    <li>In Anki, select <b>Tools → Better Anki Markdown: Connect Codex</b>.</li>
     <li>Restart Codex and open a new chat.</li>
   </ol>
-  <p class="fine-print">Anki starts the local server and saves the connection in your Codex config. Your collection is not synced automatically.</p>
+  <p class="fine-print">The local server starts with your Anki profile. This action saves the connection in your Codex config. Your collection is not synced automatically.</p>
+  <p>For Claude Code, choose <b>Tools → Better Anki Markdown: Connect Claude</b> in Anki, or run:</p>
+  <div class="code-block"><div><span>CLAUDE CODE</span><button class="copy-button" type="button" data-copy-target="claude-config">Copy <span>↗</span></button></div><pre id="claude-config">claude mcp add --transport http --scope user better-markdown-anki http://127.0.0.1:19176/mcp</pre></div>
+  <p class="fine-print">Start a new Claude Code session after setup. This configures Claude Code; the Claude Desktop chat app uses separate settings.</p>
   <details class="desktop-note"><summary>Connect another MCP client</summary>
-    <p>In Anki, select <b>Tools → Enable Better Markdown MCP</b>. Add a Streamable HTTP server at <code>http://127.0.0.1:19176/mcp</code>.</p>
+    <p>Open an Anki profile, then add a Streamable HTTP server at <code>http://127.0.0.1:19176/mcp</code>.</p>
     <p>For Copilot CLI, run:</p>
     <div class="code-block"><div><span>COPILOT CLI</span><button class="copy-button" type="button" data-copy-target="mcp-config">Copy <span>↗</span></button></div><pre id="mcp-config">copilot mcp add --transport http better-markdown-anki http://127.0.0.1:19176/mcp</pre></div>
     <p>In Antigravity, open the agent panel menu → MCP Servers → Manage MCP Servers → View raw config, and add the URL as a <code>serverUrl</code> entry.</p>

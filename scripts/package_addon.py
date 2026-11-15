@@ -7,11 +7,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ADDON = ROOT / 'better-markdown-anki'
-PUBLIC_FILES = {'__init__.py', 'utils.py', 'fenced_code.py', 'card_guidance.py',
+PUBLIC_FILES = {'__init__.py', 'utils.py', 'fenced_code.py', 'card_guidance.py', 'claude_setup.py',
                 'mcp_server.py', 'markdown_validation.py', 'codex_setup.py', 'manifest.json', 'config.json', 'config.md'}
 PUBLIC_ASSETS = {'preview/script.js', 'templates/script.html', 'templates/legacy_script.html', 'templates/media_module_script.html', 'templates/style.css',
                  'templates/basic/front.html', 'templates/basic/back.html',
                  'templates/cloze/front.html', 'templates/cloze/back.html'}
+GUIDE_FILES = ('index.html', 'styles.css', 'script.js', 'snapdeck-logo.svg', 'mountain.svg', '_walkthrough.html')
 
 
 def is_public_asset(path):
@@ -46,6 +47,11 @@ def package(output, tag):
                 manifest['version'] = tag.removeprefix('v')
                 data = (json.dumps(manifest, indent=2) + '\n').encode('utf-8')
             archive.writestr(relative, data)
+        for name in GUIDE_FILES:
+            path = ROOT / 'website' / name
+            if path.is_symlink() or not path.is_file():
+                raise ValueError('A website guide file is missing or is a symlink: ' + name)
+            archive.writestr('guide/' + name, path.read_bytes())
     print('Created', output)
 
 

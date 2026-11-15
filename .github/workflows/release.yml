@@ -60,3 +60,27 @@ jobs:
         with:
           files: better-markdown-anki-*.ankiaddon
           fail_on_unmatched_files: true
+
+  deploy-website:
+    needs: build-and-deploy
+    if: github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/configure-pages@v5
+      - name: Build the website
+        run: python3 website/build.py --output "$RUNNER_TEMP/bma-website"
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/bma-website
+      - id: deployment
+        uses: actions/deploy-pages@v4
