@@ -47,12 +47,10 @@ jobs:
       - name: Test add-on integration
         run: python3 -m unittest discover -s tests -v
 
-      - name: Embed source revision
-        run: sed -i 's/TAG = "DEV_TAG"/TAG = "${{ github.sha }}"/' better-markdown-anki/__init__.py
-
       - name: Package add-on
-        working-directory: better-markdown-anki
-        run: zip -r ../better-markdown-anki-dev.ankiaddon . -x '*.pyc' '*__pycache__*' '.DS_Store'
+        env:
+          RELEASE_REVISION: ${{ github.sha }}
+        run: python3 scripts/package_addon.py --tag "$RELEASE_REVISION" --output better-markdown-anki-dev.ankiaddon
 
       - name: Update development prerelease
         env:

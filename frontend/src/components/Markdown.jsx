@@ -1,5 +1,5 @@
 import { TypographyStylesProvider, useMantineColorScheme, Table } from '@mantine/core';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Viewer from 'viewerjs';
 import 'viewerjs/dist/viewer.css';
@@ -15,6 +15,32 @@ import {
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import 'katex/dist/katex.min.css';
 import ClozeIndexBadge from './ClozeIndexBadge';
+
+function Walkthrough({ src, title }) {
+    const [expanded, setExpanded] = useState(false);
+    useEffect(() => {
+        if (!expanded) return undefined;
+        const closeOnEscape = (event) => {
+            if (event.key === 'Escape') {
+                event.stopPropagation();
+                setExpanded(false);
+            }
+        };
+        document.addEventListener('keydown', closeOnEscape, true);
+        return () => document.removeEventListener('keydown', closeOnEscape, true);
+    }, [expanded]);
+    return <span className="bma-walkthrough" style={expanded
+        ? { position: 'fixed', inset: 0, zIndex: 2147483647, display: 'flex', flexDirection: 'column', background: 'var(--mantine-color-body, #202124)' }
+        : { display: 'block', position: 'relative' }}>
+        <button type="button" aria-label={expanded ? 'Close expanded walkthrough' : 'Expand walkthrough'}
+            onClick={() => setExpanded(value => !value)}
+            style={{ alignSelf: 'flex-end', cursor: 'pointer', padding: '4px 10px', margin: '4px', border: '1px solid #888', borderRadius: '6px', background: 'transparent', color: 'inherit', fontSize: '0.85em' }}>
+            {expanded ? 'Close ✕' : 'Expand ⤢'}
+        </button>
+        <iframe src={src} title={title || 'Interactive walkthrough'} sandbox="allow-scripts" loading="lazy"
+            style={{ display: 'block', width: '100%', height: expanded ? '100%' : '500px', flex: expanded ? 1 : undefined, border: 0 }} />
+    </span>;
+}
 
 // Function to decode HTML entities
 const decodeHtmlEntities = (text) => {
@@ -325,7 +351,7 @@ const Markdown = ({
                         ...props
                     }) => {
                         const match = /language-(\w+)/.exec(codeClassName || '');
-                        const rawCode = String(decodeHtmlEntities(codeChildren)).replace(/^\n/, '').replace(/\n$/, '');
+                        const rawCode = String(codeChildren).replace(/&(?:#\d+|#x[\da-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/g, decodeHtmlEntities).replace(/^\n/, '').replace(/\n$/, '');
                         const clozeLines = new Set();
                         rawCode.split('\n').forEach((line, lineIndex) => {
                             for (const _match of line.matchAll(CLOZE_CODE_MARKER)) {
@@ -371,12 +397,15 @@ const Markdown = ({
 
                         return highlightedCode;
                     },
-                    img: ({ className: imgClassName, ...props }) => (
-                        <img
-                            {...props}
-                            className={`${imgClassName || ''} bma-viewer-img`.trim()}
-                        />
-                    ),
+                    img: ({ className: imgClassName, ...props }) => {
+                        delete props.node;
+                        // Embed local media files using Markdown image syntax.
+                        if (props.src && /^[^/\\:?#]+\.html?$/i.test(props.src)) {
+                            return <Walkthrough src={props.src} title={props.alt} />;
+                        }
+                        return <img {...props}
+                            className={`${imgClassName || ''} bma-viewer-img`.trim()} />;
+                    },
                     // Table components using Mantine
                     table: ({ children, ...props }) => (
                         <Table

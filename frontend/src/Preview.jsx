@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@mantine/core';
 import IconCoffee from '@tabler/icons-react/dist/esm/icons/IconCoffee.mjs';
 import { TagsAndDifficulty } from './components/Tags';
+import CopyForChat from './components/CopyForChat';
 import {debounce} from 'lodash';
 import { hasExternalMutation } from './previewMutations';
 import { clozeHtml } from './clozeHtml';
@@ -164,7 +165,16 @@ function Preview() {
     return (
         // TODO optional :  w={{ base: '100%', lg: '75%' }}
         <Card shadow="sm" padding="md" radius="md" withBorder>
-            <TagsAndDifficulty tags={tags} difficulty={difficulty} />
+            <TagsAndDifficulty tags={tags} difficulty={difficulty} action={
+                (showBasicCard || showClozeCard) && <CopyForChat getFields={() => {
+                    const nodes = showBasicCard ? basicNodes : clozeNodes;
+                    return {
+                        front: nodes.front?.innerHTML || '',
+                        back: nodes.back?.innerHTML || '',
+                        extra: nodes.extra?.innerHTML || '',
+                    };
+                }} />
+            } />
             {showBasicCard && <BasicCard contentVersion={basicNodes.contentVersion} colors={colors} frontNode={basicNodes.front} backNode={basicNodes.back} extraNode={basicNodes.extra} />}
             {showClozeCard && <ClozeCard contentVersion={clozeNodes.contentVersion} colors={colors} frontNode={clozeNodes.front} backNode={clozeNodes.back} extraNode={clozeNodes.extra} />}
 

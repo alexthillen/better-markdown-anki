@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A practical guide to Better Markdown Anki: Markdown, math, code, clozes, and a local MCP connection.">
+  <title>Better Markdown for Anki</title>
+  <link rel="icon" type="image/svg+xml" href="snapdeck-logo.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Better Markdown for Anki home"><img class="brand-logo" src="snapdeck-logo.svg" alt=""><span>better<br><strong>markdown</strong></span><small>FOR ANKI</small></a>
+    <nav aria-label="Main navigation"><a href="#examples">Examples</a><a href="#how-it-works">How it works</a><a href="#setup">Setup</a></nav>
+    <a class="header-link" href="https://github.com/alexthillen/better-markdown-anki">GitHub <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="top">
+    <section class="hero container">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="status-dot"></span> AN ANKI DESKTOP ADD-ON</div>
+        <h1>Markdown cards.<br><em>Right inside Anki.</em></h1>
+        <p class="hero-lead">Write with Markdown, render math and code, and review everything in Anki.</p>
+        <div class="hero-actions"><a class="button button-primary" href="#setup">Get started <span>↗</span></a><a class="button button-text" href="#examples">Explore examples <span>↓</span></a></div>
+        <p class="local-note"><span>✳</span> Built for Anki Desktop · your notes stay yours.</p>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-preview-heading"><span>EXAMPLE CARD</span><span>LIVE PREVIEW · DARK MODE</span></div>
+        <iframe id="hero-card" class="anki-frame hero-frame" title="Example card rendered by the add-on in dark mode"></iframe>
+      </div>
+    </section>
+    <section id="examples" class="examples section-pad">
+      <div class="container">
+        <div class="section-heading"><div><p class="kicker"><span>01</span> THE TOOLKIT</p><h2>Write in Markdown.<br><em>See it in Anki.</em></h2></div><p>Explore Markdown, math, code, and cloze cards.</p></div>
+        <div class="example-shell">
+          <div class="example-sidebar"><div class="sidebar-heading"><span>EXAMPLE INDEX</span><span>10 ITEMS</span></div><div class="example-list" id="example-list" role="tablist" aria-label="Card examples"></div></div>
+          <div class="example-main" id="example-panel" role="tabpanel" aria-live="polite"><div class="example-top"><div><span id="example-number" class="example-num">01 / 10</span><h3 id="example-title">Basic card</h3></div><span class="live-label"><span></span> EXAMPLE</span></div><p id="example-description" class="example-description"></p><div class="example-panels"><div class="example-input"><div class="panel-title"><span>WHAT YOU WRITE</span><span>MARKDOWN</span></div><pre><code id="example-source"></code></pre></div><div class="example-output"><div class="panel-title"><span>HOW IT READS</span><span>LIVE PREVIEW · DARK MODE</span></div><iframe id="example-result" class="anki-frame" title="Anki card preview in dark mode"></iframe></div></div><div class="example-footer"><span>Rendered with the add-on · Anki window styling may vary</span><div><button id="prev-example" type="button" aria-label="Previous example">←</button><button id="next-example" type="button" aria-label="Next example">→</button></div></div></div>
+        </div>
+      </div>
+    </section>
+    <section id="how-it-works" class="how section-pad"><div class="container"><div class="section-heading"><div><p class="kicker"><span>02</span> THE WORKFLOW</p><h2>Familiar input.<br><em>Thoughtful output.</em></h2></div><p>Keep writing in Anki. The add-on takes care of the presentation.</p></div><div class="workflow"><article><span class="step-number">01 <span>↘</span></span><div class="step-icon">✎</div><h3>Write your note</h3><p>Choose a Better Markdown note type. Add a question, answer, and any useful context.</p></article><article><span class="step-number">02 <span>↘</span></span><div class="step-icon">{ }</div><h3>Use your syntax</h3><p>Mix Markdown with code fences, KaTeX math, tables, and cloze deletions.</p></article><article><span class="step-number">03 <span>↗</span></span><div class="step-icon">✳</div><h3>Review in context</h3><p>Preview the result in the editor, then review the rendered card in Anki.</p></article></div><div class="note-types"><div><span class="kicker-inline">TWO NOTE TYPES</span><strong>Pick the shape that fits.</strong></div><div><span class="type-pill">01</span><span><b>Basic</b><small>Front · Back · Extra</small></span></div><div><span class="type-pill alt">02</span><span><b>Cloze</b><small>Text · Back Extra</small></span></div></div></div></section>
+    <section id="setup" class="setup section-pad"><div class="container"><div class="section-heading"><div><p class="kicker"><span>03</span> GET SET UP</p><h2>Set up <em>the add-on.</em></h2></div><p>Start with the add-on. Connect an AI assistant only if you need one.</p></div><div class="setup-grid"><article class="setup-card"><div class="setup-card-top"><span>01 / INSTALL</span><span>↗</span></div><h3>Add it to Anki</h3><p>In Anki Desktop, open <b>Tools → Add-ons → Get Add-ons</b>, enter the code, and restart Anki.</p><div class="copy-box"><code>2100166052</code><button class="copy-button" type="button" data-copy="2100166052">Copy code <span>↗</span></button></div><p class="fine-print">Alternatively, install a <code>.ankiaddon</code> file via <b>Tools → Add-ons → Install from file</b>. The add-on creates the Better Markdown note types when Anki starts.</p><a href="https://ankiweb.net/shared/info/2100166052">View add-on on AnkiWeb ↗</a></article><article class="setup-card mcp-card">
+  <div class="setup-card-top"><span>02 / OPTIONAL</span><span>✳</span></div>
+  <h3>Connect an AI assistant</h3>
+  <p>Connect Codex or Claude Code while your Anki profile is open.</p>
+  <ol>
+    <li>In Anki, select <b>Tools → Better Anki Markdown: Connect Codex</b>.</li>
+    <li>Restart Codex and open a new chat.</li>
+  </ol>
+  <p class="fine-print">The local server starts with your Anki profile. This action saves the connection in your Codex config. Your collection is not synced automatically.</p>
+  <p>For Claude Code, choose <b>Tools → Better Anki Markdown: Connect Claude</b> in Anki, or run:</p>
+  <div class="code-block"><div><span>CLAUDE CODE</span><button class="copy-button" type="button" data-copy-target="claude-config">Copy <span>↗</span></button></div><pre id="claude-config">claude mcp add --transport http --scope user better-markdown-anki http://127.0.0.1:19176/mcp</pre></div>
+  <p class="fine-print">Start a new Claude Code session after setup. This configures Claude Code; the Claude Desktop chat app uses separate settings.</p>
+  <details class="desktop-note"><summary>Connect another MCP client</summary>
+    <p>Open an Anki profile, then add a Streamable HTTP server at <code>http://127.0.0.1:19176/mcp</code>.</p>
+    <p>For Copilot CLI, run:</p>
+    <div class="code-block"><div><span>COPILOT CLI</span><button class="copy-button" type="button" data-copy-target="mcp-config">Copy <span>↗</span></button></div><pre id="mcp-config">copilot mcp add --transport http better-markdown-anki http://127.0.0.1:19176/mcp</pre></div>
+    <p>In Antigravity, open the agent panel menu → MCP Servers → Manage MCP Servers → View raw config, and add the URL as a <code>serverUrl</code> entry.</p>
+  </details>
+  <div class="connection-note"><b>Local by default.</b> The server listens only on <code>127.0.0.1</code>. While enabled, local programs can read and change the open collection. Don’t expose the port publicly.</div>
+</article></div><div class="setup-bottom"><span class="asterisk">✳</span><p><strong>HTML walkthroughs are experimental.</strong> Use trusted, self-contained files and test playback and media sync on your devices.</p><a href="https://docs.ankiweb.net/media.html">Anki media guide ↗</a></div></div></section>
+  </main>
+  <footer><div class="container footer-inner"><a class="footer-brand" href="#top"><img class="brand-logo" src="snapdeck-logo.svg" alt=""> <b>better markdown</b></a><a href="#top">BACK TO TOP ↑</a></div></footer>
+</body></html>

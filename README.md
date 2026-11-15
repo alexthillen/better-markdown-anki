@@ -1,114 +1,112 @@
-# Better Markdown Anki
+# Better Markdown for Anki
 
-A powerful React-based Anki add-on that transforms your flashcards with advanced markdown rendering, interactive features, and modern web technologies for an enhanced study experience.
+Write Anki cards in Markdown, with math, code, clozes, and interactive HTML. Connect an AI agent through the built-in local MCP server to create and edit cards in your own collection.
 
-## Preview
+[Explore the website](https://alexthillen.github.io/better-markdown-anki/) · [Run it locally](website/README.md) · [AnkiWeb add-on](https://ankiweb.net/shared/info/2100166052) · [Releases](https://github.com/alexthillen/better-markdown-anki/releases)
 
-![Better Markdown Anki Review](https://raw.githubusercontent.com/alexthillen/better-markdown-anki/refs/heads/main/.github/assets/better-markdown-anki-example.gif)
+## What it does
 
-![Better Markdown Anki Preview](https://raw.githubusercontent.com/alexthillen/better-markdown-anki/refs/heads/main/.github/assets/better-markdown-anki-preview.png)
+- Render Markdown, LaTeX math, tables, and syntax-highlighted code in Anki.
+- Create Basic and Cloze notes, with an editor preview, tags, and difficulty.
+- Embed a self-contained HTML walkthrough in a card and expand it while reviewing.
+- Copy the available card fields and embedded walkthrough source for a chat.
+- Connect an MCP-compatible agent to search, validate, create, and update cards, or add an HTML walkthrough.
 
-## Features
+The MCP server runs inside Anki Desktop. No separate MCP server, API key, or cloud account is needed. It starts by default when Anki opens a profile.
 
-### 🎨 Enhanced Visual Experience
-- **Theme-aware design** that automatically adapts to Anki's light/dark mode
-- **Color-coded card sections** with distinct styling for front, back, and extra content
-- **Modern UI components** built with React and Mantine UI library
+## Install
 
-### 📝 Advanced Markdown Support
-- **Full markdown rendering** with proper formatting for headers, lists, tables, and more
-- **LaTeX math support** using KaTeX for both inline (`$...$`) and block (`$$...$$`) equations
-- **Syntax highlighting** for code blocks with language-specific coloring
-- **HTML entity decoding** for proper character display
+In Anki Desktop, choose **Tools → Add-ons → Get Add-ons**, enter `2100166052`, and restart Anki. You can also install a `.ankiaddon` file with **Tools → Add-ons → Install from file**. The latest AnkiWeb release may not yet contain the features on this branch.
 
-### 🔄 Interactive Cloze Deletions
-- **Toggle switches** for each cloze deletion to show/hide content dynamically
-- **Smart cloze processing** that preserves formatting within code blocks and math expressions
-- **Visual indicators** for active/inactive cloze states
+The add-on creates **Better Markdown : Basic** and **Better Markdown : Cloze** note types. Select one when adding a note:
 
-### 🏷️ Smart Card Organization
-- **Tag display** with styled badges for easy categorization
-- **Difficulty indicators** to show card complexity at a glance
+| Note type | Fields |
+| --- | --- |
+| Basic | Front, Back, Extra, Difficulty |
+| Cloze | Text, Back Extra, Difficulty |
 
-## Installation
+For a small interactive tour and examples, [run the guide locally](website/README.md).
 
-1. Download the add-on from the Anki add-on repository or by downloading the `.apkg`.
-2. In Anki, go to **Tools** → **Add-ons** → **Install from file...**
-3. Select the downloaded file and restart Anki
-4. The add-on will automatically create the necessary note types on first launch
+## Connect an agent
 
-## Note Types
+### Codex
 
-The add-on creates two specialized note types:
+With your Anki profile open, select **Tools → Better Anki Markdown: Connect Codex**. Restart Codex and open a new chat. Anki enables the server and adds the connection to your Codex configuration.
 
-### Better Markdown : Basic
-- **Fields**: Front, Back, Extra, Difficulty
-- **Use case**: Traditional question-answer flashcards with markdown formatting
+To configure Codex from a terminal instead, open an Anki profile and run:
 
-### Better Markdown : Cloze
-- **Fields**: Text, Back Extra, Difficulty  
-- **Use case**: Interactive cloze deletion cards with enhanced markdown support
+```sh
+codex mcp add better-markdown-anki --url http://127.0.0.1:19176/mcp
+```
 
-## Usage
+### Claude Code
 
-1. Create a new note using one of the "Better Markdown" note types
-2. Write your content using standard markdown syntax
-3. The add-on will automatically render your markdown with enhanced styling
-4. Math expressions can be written using LaTeX syntax
-5. Use toggle switches to interact with cloze deletions dynamically
+With your Anki profile open, select **Tools → Better Anki Markdown: Connect Claude** and start a new Claude Code session. Claude Code must be installed. Alternatively, run:
 
-## Technical Architecture
+```sh
+claude mcp add --transport http --scope user better-markdown-anki http://127.0.0.1:19176/mcp
+```
 
-### Core Technologies
-- **React 19** with modern hooks and functional components
-- **Mantine UI** for consistent, accessible component design
-- **Vite** for fast development and optimized builds
-- **TypeScript** support for type safety
+This configures Claude Code; the Claude Desktop chat app uses separate settings. See the [Claude Code MCP guide](https://code.claude.com/docs/en/mcp).
 
-### Markdown Processing Pipeline
-- **`ReactMarkdown`** for base markdown parsing
-- **`remark-math`** + **`rehype-katex`** for mathematical expressions
-- **`react-syntax-highlighter`** for code block formatting
+### Other MCP clients
 
-### Key Features
-- **DOM mutation observation** for real-time card updates
-- **Automatic theme detection** from Anki's CSS classes
-- **Python backend integration** with Anki's API
-- **Automatic template and field management** with version control
+Open an Anki profile, then add a Streamable HTTP server at `http://127.0.0.1:19176/mcp` (or the port in the add-on configuration).
+
+For GitHub Copilot CLI:
+
+```sh
+copilot mcp add --transport http better-markdown-anki http://127.0.0.1:19176/mcp
+```
+
+For Google Antigravity, open the agent panel menu → **MCP Servers → Manage MCP Servers → View raw config** and merge this into `mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "better-markdown-anki": {
+      "serverUrl": "http://127.0.0.1:19176/mcp"
+    }
+  }
+}
+```
+
+Other MCP clients can use the same URL. The client and Anki must run on the same machine: `127.0.0.1` on a remote machine refers to that machine. See the [Copilot setup guide](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers) and [Antigravity MCP guide](https://antigravity.google/docs/mcp).
+
+The server binds to localhost and requires no token. **While it is enabled, local programs can read and change your open Anki collection.** It does not start a sync; changes follow your usual Anki sync. To disable it, set `mcp_enabled` to `false` in the add-on's Config and restart Anki. Do not expose the port to the public internet.
+
+### Writing cards with an agent
+
+Ask your agent to call `card_authoring_guide` for the supported fields, formatting, and HTML walkthrough instructions. It can call `validate_note` before saving; validation catches common issues but does not replace previewing the card in Anki.
+
+For example, ask: “Create a Basic card in my chosen deck explaining why a database uses a write-ahead log. Include a short example in Extra.” The agent can list available decks, then use `create_note` with Markdown fields. `get_note` returns Anki's stored HTML; `update_note` accepts Markdown and changes only the supplied fields.
+
+## Interactive HTML walkthroughs
+
+Place a trusted, self-contained `.html` file in the profile's `collection.media` folder and reference its filename using image syntax:
+
+```markdown
+![Interactive walkthrough](_walkthrough.html)
+```
+
+The card renders the file in a sandboxed frame. An agent can also use `store_html_walkthrough`, which stores the file and returns Markdown to embed it. This feature is experimental: test playback, media sync, and exports on your devices. The sandbox restricts links, forms, storage, and separately loaded resources. See [Anki's media documentation](https://docs.ankiweb.net/media.html).
 
 ## Development
 
-```bash
-# Install frontend dependencies
+```sh
 cd frontend
-npm install
-
-# Start development server
+npm ci
 npm run fixtures
 npm run dev
+# Open http://localhost:5173/deck-preview.html
 
-# Open http://localhost:5173/deck-preview.html to inspect the imported decks
-
-# Run the automated regression suite and lint checks
 npm test
 npm run lint
-
-# Build the production assets into better-markdown-anki/dist
 npm run build
-
-# Run the add-on integration tests from the repository root
 cd ..
 python3 -m unittest discover -s tests -v
 ```
 
-## Configuration
+The fixture generator uses invented examples and does not read an Anki collection. `npm run build` produces both the desktop and mobile renderer assets. To view the guide locally, run `python3 website/server.py` from the repository root.
 
-The add-on includes automatic configuration management:
-- Templates are updated automatically when the add-on loads
-- Missing fields are added to existing note types
-- Theme mode detection from Anki's CSS classes
-- Content changes monitored through DOM mutation observation
-
-## Browser Compatibility
-
-Optimized for modern browsers with support for ES2020+ features, CSS custom properties, and DOM MutationObserver API.
+The add-on preserves existing card templates when a profile opens. It updates only recognized older loader blocks for mobile compatibility and adds missing note-type fields when needed. On desktop, fenced-code protection runs when loading the editor and displaying a card; it cannot recover text already saved in a corrupted form.
