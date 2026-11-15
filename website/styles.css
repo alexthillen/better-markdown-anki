@@ -50,10 +50,6 @@ h1 em, h2 em { font: inherit; color: inherit; }
 .hero-preview-heading { display: flex; justify-content: space-between; gap: 12px; color: #98a1b0; font-size: 10px; font-weight: 650; letter-spacing: .04em; padding: 0 4px 13px; }
 .anki-frame { display: block; width: 100%; height: 350px; min-height: 180px; border: 0; border-radius: 8px; background: #1a1b1e; color-scheme: dark; }
 .hero-frame { height: 400px; }
-.section-ticker { color: #8b96a8; overflow: hidden; }
-.section-ticker > div { max-width: 1330px; margin: auto; display: flex; justify-content: center; gap: 13px; align-items: center; white-space: nowrap; padding: 0 24px 30px; font-size: 10px; font-weight: 750; letter-spacing: .06em; }
-.section-ticker span { padding: 7px 10px; border-radius: 999px; background: #eef1fb; color: #71809a; }
-.section-ticker b { color: #b4bdd1; font-size: 10px; }
 .section-pad { padding: 96px 0; }
 .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 50px; margin-bottom: 36px; }
 .kicker { margin: 0 0 20px; }
@@ -136,26 +132,12 @@ h2 { margin: 0; font-size: clamp(35px, 4vw, 52px); line-height: 1.1; }
 .setup-bottom p { margin: 0; color: #6e7d98; font-size: 12px; line-height: 1.5; }
 .setup-bottom p strong { color: #38445b; }
 .setup-bottom a { margin-left: auto; color: var(--accent); white-space: nowrap; font-size: 11px; font-weight: 700; }
-.references { padding: 75px 0 100px; border-top: 1px solid #e6eaf2; }
-.references-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
-.references h2 { font-size: 39px; }
-.references h2 em { color: var(--accent); }
-.reference-list a { display: flex; align-items: center; gap: 18px; padding: 17px 0; border-bottom: 1px solid var(--line); }
-.reference-list a:first-child { border-top: 1px solid var(--line); }
-.reference-list a > span { color: #9ba5b4; font: 10px ui-monospace, monospace; }
-.reference-list b, .reference-list small { display: block; }
-.reference-list b { font-size: 13px; }
-.reference-list small { margin-top: 4px; color: #9ba5b4; font-size: 11px; }
-.reference-list i { margin-left: auto; color: #5c7cfa; font-style: normal; }
-.reference-list a:hover b { color: #5c7cfa; }
 footer { padding: 43px 0 25px; background: #edf0f8; color: #516078; }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .footer-brand { display: flex; align-items: center; gap: 4px; color: var(--ink); font-size: 20px; font-weight: 700; }
 .footer-brand .brand-logo { width: 30px; height: 30px; }
 .footer-brand b { margin-left: 7px; font-size: 13px; }
-.footer-inner p { margin: 0; color: #8995a5; font-size: 13px; }
-.footer-inner > a:last-child, .footer-meta { color: #96a2b2; font-size: 9px; font-weight: 700; letter-spacing: .12em; }
-.footer-meta { display: flex; justify-content: space-between; gap: 10px; margin-top: 33px; padding-top: 21px; border-top: 1px solid #dce3ef; }
+.footer-inner > a:last-child { color: #96a2b2; font-size: 9px; font-weight: 700; letter-spacing: .12em; }
 @media (max-width: 900px) {
   .container { width: min(720px, calc(100% - 48px)); }
   .site-header { padding: 0 24px; gap: 18px; }
@@ -165,7 +147,6 @@ footer { padding: 43px 0 25px; background: #edf0f8; color: #516078; }
   .example-shell { grid-template-columns: 190px 1fr; }
   .example-panels { grid-template-columns: 1fr; }
   .example-input { min-height: 140px; }
-  .references-inner { gap: 40px; }
 }
 @media (max-width: 600px) {
   .container { width: calc(100% - 36px); }
@@ -180,7 +161,6 @@ footer { padding: 43px 0 25px; background: #edf0f8; color: #516078; }
   .section-pad { padding: 72px 0; }
   .section-heading { display: block; margin-bottom: 32px; }
   .section-heading > p { margin-top: 20px; }
-  .section-ticker > div { justify-content: flex-start; padding-bottom: 22px; }
   .example-shell { display: block; }
   .example-sidebar { padding: 15px 0; border-right: 0; border-bottom: 1px solid #e9ecf4; }
   .sidebar-heading { padding-bottom: 10px; }
@@ -200,8 +180,5 @@ footer { padding: 43px 0 25px; background: #edf0f8; color: #516078; }
   .setup-bottom { align-items: flex-start; flex-wrap: wrap; }
   .setup-bottom p { flex: 1; }
   .setup-bottom a { margin-left: 45px; }
-  .references { padding: 70px 0; }
-  .references-inner { grid-template-columns: 1fr; gap: 30px; }
   .footer-inner { align-items: flex-start; flex-direction: column; }
-  .footer-meta { flex-direction: column; }
 }
