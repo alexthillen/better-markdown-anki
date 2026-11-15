@@ -1,1 +1,0 @@
-ffmpeg -i better-markdown-anki-example.mp4 -vf "fps=20,scale=1200:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 better-markdown-anki-example.gif

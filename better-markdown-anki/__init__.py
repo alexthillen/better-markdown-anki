@@ -6,6 +6,7 @@ from anki.hooks import addHook
 from anki.lang import _
 from anki.collection import Collection
 from .utils import add_folder_to_media, patch_variables_in_file
+from .fenced_code import protect_editor_fields, protect_review_html
 
 
 ################################ CONFIGURATION #####################################################
@@ -28,6 +29,8 @@ SCRIPT_TEMPLATE = patch_variables_in_file(
     dict(TAG=TAG, ADDON_PACKAGE=ADDON_PACKAGE),
 )
 CSS_TEMPLATE = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "style.css"), dict(TAG=TAG))
+LEGACY_SCRIPT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "legacy_script.html"), dict())
+MEDIA_MODULE_SCRIPT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "media_module_script.html"), dict())
 BASIC_TEMPLATE_FRONT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "basic", "front.html"), dict()) + SCRIPT_TEMPLATE
 BASIC_TEMPLATE_BACK = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "basic", "back.html"), dict()) + SCRIPT_TEMPLATE
 CLOZE_TEMPLATE_FRONT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "cloze", "front.html"), dict()) + SCRIPT_TEMPLATE
@@ -179,14 +182,14 @@ def setup_custom_note_types():
             print(f"✓ {basic_name} note type created successfully")
         else:
             # If creation failed (note type exists), try to update it
-            update_existing_note_type(basic_name, update_templates=True)
+            update_existing_note_type(basic_name)
         
         cloze_success = create_note_type(cloze_name, "cloze")
         if cloze_success:
             print(f"✓ {cloze_name} note type created successfully")
         else:
             # If creation failed (note type exists), try to update it
-            update_existing_note_type(cloze_name, update_templates=True)
+            update_existing_note_type(cloze_name)
             
         # Refresh the UI to show new note types
         mw.reset()
@@ -214,7 +217,9 @@ def update_existing_note_type(note_type_name: str, update_templates: bool = Fals
     if not model:
         print(f"Note type '{note_type_name}' not found")
         return False
-    
+
+
+
     # Get current field names
     current_fields = [field['name'] for field in model['flds']]
     
@@ -254,16 +259,131 @@ def update_existing_note_type(note_type_name: str, update_templates: bool = Fals
 
 
 
+
+def update_mobile_loader():
+    """Replace only an exact, recognized old loader, keeping other template edits."""
+    patterns = []
+    for old_script in (LEGACY_SCRIPT, MEDIA_MODULE_SCRIPT):
+        escaped = re.escape(old_script)
+        escaped = escaped.replace(re.escape('{TAG}'), r"[^'\"\r\n]+")
+        escaped = escaped.replace(re.escape('{ADDON_PACKAGE}'), r"[^/'\"\r\n]+")
+        patterns.append(re.compile(escaped))
+    changed = 0
+    for name in (CARD_NAME.format(type='Basic'), CARD_NAME.format(type='Cloze')):
+        model = mw.col.models.by_name(name)
+        if not model:
+            continue
+        dirty = False
+        for template in model['tmpls']:
+            for field in ('qfmt', 'afmt'):
+                for pattern in patterns:
+                    updated, count = pattern.subn(lambda _: SCRIPT_TEMPLATE, template[field])
+                    if count:
+                        template[field] = updated
+                        changed += count
+                        dirty = True
+        if dirty:
+            mw.col.models.save(model)
+    return changed
+
+
 # Initialize when add-on loads
 if __name__ != "__main__":
     from aqt import gui_hooks
+    from .mcp_server import MCPServer
+    from .codex_setup import configure_codex
+
+    _mcp_server = None
+    _codex_action = None
+    _mcp_action = None
+
+    def start_mcp_server():
+        global _mcp_server
+        config = mw.addonManager.getConfig(__name__) or {}
+        if not config.get('mcp_enabled', False):
+            return
+        try:
+            port = config.get('mcp_port', 19176)
+            if isinstance(port, bool) or not isinstance(port, int) or not 1024 <= port <= 65535:
+                raise ValueError('mcp_port must be an integer between 1024 and 65535')
+            _mcp_server = MCPServer(mw, port)
+            _mcp_server.start()
+            print('[Better Markdown] MCP enabled on 127.0.0.1:%d' % port)
+        except (OSError, ValueError) as exc:
+            _mcp_server = None
+            from aqt.utils import showWarning
+            showWarning('Better Markdown MCP could not start: %s' % exc)
+
+    def stop_mcp_server():
+        global _mcp_server
+        if _mcp_server:
+            _mcp_server.stop()
+            _mcp_server = None
     
+    def ensure_mcp_running():
+        from aqt.utils import showWarning
+        if not mw.col:
+            showWarning('Open an Anki profile before connecting an MCP client.')
+            return False
+        config = mw.addonManager.getConfig(__name__) or {}
+        if not config.get('mcp_enabled', False):
+            config['mcp_enabled'] = True
+            mw.addonManager.writeConfig(__name__, config)
+        if _mcp_server is None:
+            start_mcp_server()
+        if _mcp_server is None:
+            return False  # start_mcp_server already showed the reason
+        config = mw.addonManager.getConfig(__name__) or {}
+        if config.get('mcp_port', 19176) != _mcp_server.port:
+            showWarning('MCP settings changed while Anki was running. Restart Anki and try again.')
+            return False
+        return True
+
+    def connect_mcp():
+        from aqt.utils import showInfo
+        if not ensure_mcp_running():
+            return
+        showInfo('Better Markdown MCP is enabled at http://127.0.0.1:%d/mcp. '
+                 'For a compatible client, use Streamable HTTP with this URL. '
+                 'Local programs can access your open collection while MCP is enabled.' % _mcp_server.port)
+
+    def connect_codex():
+        from pathlib import Path
+        from aqt.utils import showInfo, showWarning
+        if not ensure_mcp_running():
+            return
+        try:
+            configure_codex(Path(os.environ.get('CODEX_HOME') or (Path.home() / '.codex')) / 'config.toml', _mcp_server.port)
+        except (OSError, ValueError) as exc:
+            showWarning('Could not configure Codex: %s' % exc)
+            return
+        showInfo('Codex is configured to use Better Markdown. Restart Codex and open a new chat to load the tools.')
+
+    def install_codex_action():
+        global _codex_action, _mcp_action
+        if _codex_action is not None:
+            return
+        from aqt.qt import QAction
+        _codex_action = QAction('Connect Better Markdown to Codex', mw)
+        _codex_action.triggered.connect(connect_codex)
+        mw.form.menuTools.addAction(_codex_action)
+        _mcp_action = QAction('Enable Better Markdown MCP', mw)
+        _mcp_action.triggered.connect(connect_mcp)
+        mw.form.menuTools.addAction(_mcp_action)
+
     def on_profile_loaded():
         """Called when user profile is loaded"""
         mw.addonManager.setWebExports(__name__, r"(dist|preview)/.*\.(css|js|woff2?|ttf)")
         setup_custom_note_types()
+        update_mobile_loader()
         add_folder_to_media(DIST_DIRECTORY, overwrite=True)
         add_folder_to_media(PREVIEW_DIRECTORY, overwrite=True)
+        install_codex_action()
+        start_mcp_server()
     
+    gui_hooks.editor_will_load_note.append(protect_editor_fields)
+    gui_hooks.card_will_show.append(protect_review_html)
+
     # Hook into Anki's profile loading
     gui_hooks.profile_did_open.append(on_profile_loaded)
+    gui_hooks.profile_will_close.append(stop_mcp_server)

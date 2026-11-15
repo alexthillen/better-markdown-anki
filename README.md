@@ -4,7 +4,7 @@ A powerful React-based Anki add-on that transforms your flashcards with advanced
 
 ## Preview
 
-![Better Markdown Anki Review](https://raw.githubusercontent.com/alexthillen/better-markdown-anki/refs/heads/main/.github/assets/better-markdown-anki-example.gif)
+![Better Markdown Anki preview](.github/assets/better-markdown-anki-preview.png)
 
 ![Better Markdown Anki Preview](https://raw.githubusercontent.com/alexthillen/better-markdown-anki/refs/heads/main/.github/assets/better-markdown-anki-preview.png)
 
@@ -32,10 +32,76 @@ A powerful React-based Anki add-on that transforms your flashcards with advanced
 
 ## Installation
 
-1. Download the add-on from the Anki add-on repository or by downloading the `.apkg`.
+1. Download the add-on from the Anki add-on repository or by downloading the `.ankiaddon`.
 2. In Anki, go to **Tools** → **Add-ons** → **Install from file...**
 3. Select the downloaded file and restart Anki
 4. The add-on will automatically create the necessary note types on first launch
+
+## Built-in MCP server
+
+Better Markdown includes an optional, local MCP server for compatible assistants.
+It exposes public card-writing guidance plus tools to list decks, search and read
+Better Markdown notes, create or update notes, and store a local HTML walkthrough.
+The MCP server requires Anki desktop with an open profile; it does not work when
+Anki is closed. It is disabled by default and does not sync your collection.
+
+### Connect Codex
+
+1. Open an Anki profile and select **Tools → Connect Better Markdown to Codex**.
+2. Restart Codex and open a new chat. The action enables the server and saves
+   the connection in Codex's config.
+
+Alternatively, select **Tools → Enable Better Markdown MCP** in Anki and run:
+
+```sh
+codex mcp add better-markdown-anki --url http://127.0.0.1:19176/mcp
+```
+
+### Connect other MCP clients
+
+Select **Tools → Enable Better Markdown MCP** in Anki. Connect a Streamable HTTP
+client to `http://127.0.0.1:19176/mcp` (or the configured port).
+
+For **GitHub Copilot CLI**, run:
+
+```sh
+copilot mcp add --transport http better-markdown-anki http://127.0.0.1:19176/mcp
+```
+
+For **Google Antigravity**, open the agent panel menu → MCP Servers → Manage MCP
+Servers → View raw config, and merge this entry into `mcp_config.json`:
+
+```json
+{"mcpServers":{"better-markdown-anki":{"serverUrl":"http://127.0.0.1:19176/mcp"}}}
+```
+
+Other compatible agents can use the same URL. Anki must be open on the same
+machine as the client; `127.0.0.1` on a remote machine refers to that machine.
+See the [Copilot MCP reference](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers)
+and [Antigravity MCP guide](https://antigravity.google/docs/mcp) for details.
+
+The server binds only to `127.0.0.1` and rejects nonlocal Host and Origin
+headers. While enabled, local programs can read and change your open collection
+without authentication. Do not expose the port publicly. Disable `mcp_enabled`
+and restart Anki to turn the server off.
+
+### Using the tools
+
+Call `card_authoring_guide` for general writing, formatting, and step-by-step HTML walkthrough instructions. Call `validate_note` to check a complete card before saving it. The create and update tools reject detected errors and return warnings; validation is best-effort and does not replace an Anki preview.
+`create_note` accepts `note_type` (`basic` or `cloze`), an existing `deck`, and
+plain Markdown `fields`. For example, a Basic note can use:
+
+```json
+{"deck":"Default","note_type":"basic","fields":{"Front":"Why use a write-ahead log?","Back":"**It records changes before data pages are written, enabling recovery.**","Extra":"A database can replay committed changes after a crash."},"tags":["Databases"]}
+```
+
+Cloze fields are `Text`, `Back Extra`, and `Difficulty`; Basic fields are
+`Front`, `Back`, `Extra`, and `Difficulty`. The server escapes Markdown for
+Anki's HTML storage. `get_note` reports stored field values in Anki HTML;
+`update_note` accepts plain Markdown and replaces only the fields supplied.
+Keep a backup before bulk edits. MCP changes are local until your usual Anki
+sync runs. The experimental HTML walkthrough tool stores a file in media;
+verify playback, export, and sync on your target clients.
 
 ## Note Types
 
@@ -56,6 +122,26 @@ The add-on creates two specialized note types:
 3. The add-on will automatically render your markdown with enhanced styling
 4. Math expressions can be written using LaTeX syntax
 5. Use toggle switches to interact with cloze deletions dynamically
+
+### Copy a card for an LLM chat
+
+Select **Copy for LLM chat** beside the tags and difficulty to copy the available front, back, and extra fields in a labeled prompt. Local HTML walkthroughs referenced with image syntax are included as HTML source. If a file cannot be read, its filename is included in the prompt and the button reports it. On the question side, only currently available fields are copied. On cloze review cards, Anki supplies the revealed text on the answer side; a separate front field may not be available.
+
+### Fenced-code protection
+
+On Anki desktop, the add-on protects fenced code when the editor loads and before the reviewer displays it, keeping comparisons and HTML tags from being interpreted as markup. This does not repair a field that was already saved in a corrupted form, and external tools that save raw HTML can still damage a field before the add-on sees it. Anki's editor line-break and cloze markup is preserved where recognizable.
+
+### Interactive HTML walkthroughs (experimental)
+
+Copy a self-contained HTML file into the active profile's `collection.media` folder and reference it in a note with image syntax:
+
+```markdown
+![Sliding-window walkthrough](_sliding-window.html)
+```
+
+The renderer displays local `.html` or `.htm` filenames in a 500-pixel-high sandboxed frame with scripts enabled. Use trusted, self-contained files: the sandbox restricts same-origin access, and links, forms, storage, and separately loaded resources may not work. Ordinary images continue to render as images. The filename must be a single media filename, not a path or URL.
+
+This feature has not yet been verified on Anki desktop or mobile. Anki's media checker may not recognize Markdown references; a leading underscore protects the file from the unused-media check, but verify that the file reaches each device and is included in exports before relying on it. See the [Anki media manual](https://docs.ankiweb.net/media.html).
 
 ## Technical Architecture
 
@@ -87,7 +173,7 @@ npm install
 npm run fixtures
 npm run dev
 
-# Open http://localhost:5173/deck-preview.html to inspect the imported decks
+# Open http://localhost:5173/deck-preview.html to inspect the example cards
 
 # Run the automated regression suite and lint checks
 npm test

@@ -32,9 +32,12 @@ export function DifficultyBadge({ difficulty }) {
   )
 }
 
-export function TagsAndDifficulty({ tags, difficulty }) {
+export function TagsAndDifficulty({ tags, difficulty, action }) {
     return <Group justify="space-between" align="flex-start" wrap="wrap">
-        <DifficultyBadge difficulty={difficulty} />
+        <Group gap="sm" align="center" mb="sm">
+            {difficulty && <Badge variant="light" color="orange" size="lg">{difficulty}</Badge>}
+            {action}
+        </Group>
         <Tags tags={tags} />
     </Group>
 }

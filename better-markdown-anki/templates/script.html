@@ -1,57 +1,30 @@
 <script>
     (function() {
-        var jsLocal = '/_addons/{ADDON_PACKAGE}/dist/_better_markdown_anki.js';
-        var jsCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/better-markdown-anki/dist/_better_markdown_anki.js';
-        var cssLocal = '/_addons/{ADDON_PACKAGE}/dist/_better_markdown_anki.css';
-        var cssCDN = 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/better-markdown-anki/dist/_better_markdown_anki.css';
-        var cssUser = '_better_markdown_anki_user_style.css';
-        // Load CSS
-        function loadCSS(href, fallback) {
+        var mobile = location.protocol === 'file:';
+        var css = mobile ? ['_better_markdown_anki_mobile.css'] : ['/_addons/{ADDON_PACKAGE}/dist/_better_markdown_anki.css', '_better_markdown_anki.css', 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/better-markdown-anki/dist/_better_markdown_anki.css'];
+        var js = mobile ? ['_better_markdown_anki_mobile.js'] : ['/_addons/{ADDON_PACKAGE}/dist/_better_markdown_anki.js', '_better_markdown_anki.js', 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/better-markdown-anki/dist/_better_markdown_anki.js'];
+        function loadCSS(sources, index) {
+            if (index >= sources.length) return;
             var link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = href;
-            link.onerror = function() {
-                if (fallback) {
-                    var fallbackLink = document.createElement('link');
-                    fallbackLink.rel = 'stylesheet';
-                    fallbackLink.href = fallback;
-                    document.head.appendChild(fallbackLink);
-                }
-            };
+            link.href = sources[index];
+            link.onerror = function() { loadCSS(sources, index + 1); };
             document.head.appendChild(link);
         }
-
-        function loadCSSSilent(href) {
-            var link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = href;
-            link.onerror = function() {
-                console.log('CSS failed to load:', href);
-            };
-            document.head.appendChild(link);
+        function loadJS(sources, index) {
+            if (index >= sources.length || document.querySelector('script[data-bma-loader]')) return;
+            var script = document.createElement('script');
+            if (!mobile) script.type = 'module';
+            script.src = sources[index];
+            script.setAttribute('data-bma-loader', '');
+            script.onerror = function() { script.remove(); loadJS(sources, index + 1); };
+            document.head.appendChild(script);
         }
-
-        // Load JS as ES Module
-        function loadJS(src, fallback) {
-            var scriptSelector = 'script[src="' + src + '"]';
-            if (!document.querySelector(scriptSelector)) {
-                var script = document.createElement('script');
-                script.type = 'module'; // Essential for ES modules
-                script.src = src;
-                script.onerror = function() {
-                    if (fallback && !document.querySelector('script[src="' + fallback + '"]')) {
-                        var fallbackScript = document.createElement('script');
-                        fallbackScript.type = 'module';
-                        fallbackScript.src = fallback;
-                        document.head.appendChild(fallbackScript);
-                    }
-                };
-                document.head.appendChild(script);
-            }
-        }
-
-        loadCSS(cssLocal, cssCDN);
-        loadCSSSilent(cssUser);
-        loadJS(jsLocal, jsCDN);
+        loadCSS(css, 0);
+        var userStyle = document.createElement('link');
+        userStyle.rel = 'stylesheet';
+        userStyle.href = '_better_markdown_anki_user_style.css';
+        document.head.appendChild(userStyle);
+        loadJS(js, 0);
     })();
 </script>

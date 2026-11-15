@@ -2,7 +2,7 @@ name: Build and Deploy Anki Add-on
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 permissions:
   contents: write
@@ -11,41 +11,52 @@ jobs:
   build-and-deploy:
     if: github.event.release.prerelease == false
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout repository
+      - name: Checkout release tag
         uses: actions/checkout@v4
-      
-      - name: Extract version from tag
-        id: extract_version
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Test frontend
+        working-directory: frontend
+        run: npm test
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      # Card templates fall back to CDN files at the release tag. Those files
+      # must match the exact build being packaged, including hashed chunks.
+      - name: Verify committed frontend assets
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "Building version: ${VERSION}"
-      
-      - name: Update version tag in __init__.py
+          if [ -n "$(git status --porcelain -- better-markdown-anki/dist)" ]; then
+            echo "Committed frontend assets are stale. Build and commit dist before tagging."
+            git status --short -- better-markdown-anki/dist
+            exit 1
+          fi
+
+      - name: Test add-on
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Embed release tag and package
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          echo "Before replacement:"
-          cat better-markdown-anki/__init__.py
-          
-          sed -i 's/TAG = "DEV_TAG"/TAG = "${{ steps.extract_version.outputs.version }}"/g' better-markdown-anki/__init__.py
-          
-          echo "After replacement:"
-          grep "TAG =" better-markdown-anki/__init__.py
-      
-      - name: Create add-on package
-        run: |
-          cd better-markdown-anki
-          zip -r ../better-markdown-anki-${{ steps.extract_version.outputs.version }}.ankiaddon *
-          cd ..
-          
-          echo "Package created:"
-          ls -la *.ankiaddon
-      
-      - name: Upload to release
+          python3 scripts/package_addon.py --tag "$RELEASE_TAG" --output "better-markdown-anki-${RELEASE_TAG}.ankiaddon"
+
+      - name: Upload release package
         uses: softprops/action-gh-release@v2
         with:
-          files: better-markdown-anki-${{ steps.extract_version.outputs.version }}.ankiaddon
+          files: better-markdown-anki-*.ankiaddon
           fail_on_unmatched_files: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

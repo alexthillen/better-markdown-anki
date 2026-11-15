@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "fixtures": "python3 ../scripts/extract_deck_fixtures.py",
-    "build": "vite build && rm dist/index.html && rm -rf ../better-markdown-anki/dist && mv -f dist ../better-markdown-anki/dist",
+    "fixtures": "python3 ../scripts/generate_deck_fixtures.py",
+    "build": "vite build && vite build --config vite.mobile.config.js --outDir dist && rm dist/index.html && rm -rf ../better-markdown-anki/dist && mv -f dist ../better-markdown-anki/dist",
     "lint": "eslint .",
     "test": "vitest run",
     "preview": "vite preview"

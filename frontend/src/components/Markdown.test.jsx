@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core';
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import Markdown from './Markdown';
 
@@ -65,6 +65,36 @@ describe('Markdown', () => {
         const container = renderMarkdown('![diagram](https://example.com/diagram.png)');
 
         expect(container.querySelector('img')?.getAttribute('src')).toBe('https://example.com/diagram.png');
+    });
+
+    it('preserves angle brackets and following content in fenced code', () => {
+        const container = renderMarkdown('```text\nnums[dq[-1]]&lt;val\n```\n\n**after**');
+        expect(container.textContent).toContain('nums[dq[-1]]<val');
+        expect(container.querySelector('strong')?.textContent).toBe('after');
+    });
+
+    it('renders MCP-escaped code symbols literally without losing following text', () => {
+        const container = renderMarkdown('```html\n&lt;div&gt;x &amp;&amp; y&lt;/div&gt;\n```\n\nAfter.');
+        expect(container.textContent).toContain('<div>x && y</div>');
+        expect(container.textContent).toContain('After.');
+    });
+
+    it('embeds a local HTML walkthrough in a sandbox', () => {
+        const container = renderMarkdown('![Walkthrough](_walkthrough.html)');
+        const frame = container.querySelector('iframe');
+        expect(frame?.getAttribute('src')).toBe('_walkthrough.html');
+        expect(frame?.getAttribute('sandbox')).toBe('allow-scripts');
+    });
+
+    it('expands and closes a walkthrough without replacing the iframe', () => {
+        const container = renderMarkdown('![Walkthrough](_walkthrough.html)');
+        const frame = container.querySelector('iframe');
+        fireEvent.click(container.querySelector('[aria-label="Expand walkthrough"]'));
+        expect(container.querySelector('iframe')).toBe(frame);
+        expect(frame.parentElement.style.position).toBe('fixed');
+        fireEvent.keyDown(document, { key: 'Escape' });
+        expect(container.querySelector('iframe')).toBe(frame);
+        expect(frame.parentElement.style.position).toBe('relative');
     });
 
     it('renders math nested in editor HTML', () => {
