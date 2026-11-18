@@ -121,4 +121,25 @@ describe('Markdown', () => {
 
         expect(container.querySelector('.bma-cloze-index')).toBeNull();
     });
+
+    it('keeps additional-protocol links such as obsidian:// clickable', () => {
+        const container = renderMarkdown('[open note](obsidian://open?vault=main&file=note.md)');
+
+        const anchor = container.querySelector('a');
+        expect(anchor).not.toBeNull();
+        expect(anchor.getAttribute('href')).toBe('obsidian://open?vault=main&file=note.md');
+    });
+
+    it('still strips javascript: URLs from links', () => {
+        const container = renderMarkdown('[click](javascript:alert(1))');
+
+        const href = container.querySelector('a')?.getAttribute('href') ?? '';
+        expect(href).not.toContain('javascript:');
+    });
+
+    it('keeps regular http links unchanged', () => {
+        const container = renderMarkdown('[site](https://example.com/page)');
+
+        expect(container.querySelector('a')?.getAttribute('href')).toBe('https://example.com/page');
+    });
 });

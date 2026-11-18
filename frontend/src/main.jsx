@@ -16,6 +16,28 @@ const clozeIds = ['front-card-cloze', 'back-card-cloze', 'extra-card-cloze'];
 const isCard = [...basicIds, ...clozeIds].some(id => document.getElementById(id) !== null);
 document.body.classList.toggle('bma-review', isCard);
 
+// Open external-protocol links (e.g. obsidian://) through Anki's URL-scheme
+// dialog. Qt WebEngine silently drops main-frame navigations to schemes it
+// does not know, so they never reach Anki's acceptNavigationRequest handler.
+const ANCHOR_PROTOCOLS_HANDLED_BY_ANKI = new Set(['http:', 'https:', 'mailto:', 'tel:']);
+document.addEventListener('click', (event) => {
+    const anchor = event.target?.closest?.('a[href]');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href');
+    if (!href) return;
+    let protocol = '';
+    try {
+        protocol = new URL(href, window.location.href).protocol;
+    } catch {
+        return;
+    }
+    if (!protocol || ANCHOR_PROTOCOLS_HANDLED_BY_ANKI.has(protocol)) return;
+    event.preventDefault();
+    if (typeof pycmd === 'function') {
+        pycmd(`bma-open-url:${href}`);
+    }
+}, true);
+
 // Document setup for React
 const oldRoot = document.getElementById('root-react')
 if (oldRoot) {
