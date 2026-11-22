@@ -75,3 +75,13 @@ def add_folder_to_media(folder_path: str, overwrite: bool = False):
         for file in files:
             file_path = os.path.join(root, file)
             _add_file_to_media(file_path, overwrite=overwrite)
+
+
+def ensure_user_stylesheet(media_dir: str):
+    """Provide the optional stylesheet without replacing user customizations."""
+    path = os.path.join(media_dir, '_better_markdown_anki_user_style.css')
+    try:
+        with open(path, 'x', encoding='utf-8') as stylesheet:
+            stylesheet.write('/* Add custom Better Markdown styles here. */\n')
+    except FileExistsError:
+        pass

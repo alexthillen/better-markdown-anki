@@ -1,6 +1,6 @@
 <script>
     (function() {
-        var mobile = location.protocol === 'file:';
+        var mobile = location.protocol === 'file:' || /Android/i.test(navigator.userAgent);
         var css = mobile ? ['_better_markdown_anki_mobile.css'] : ['/_addons/{ADDON_PACKAGE}/dist/_better_markdown_anki.css', '_better_markdown_anki.css', 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/better-markdown-anki/dist/_better_markdown_anki.css'];
         var js = mobile ? ['_better_markdown_anki_mobile.js'] : ['/_addons/{ADDON_PACKAGE}/dist/_better_markdown_anki.js', '_better_markdown_anki.js', 'https://cdn.jsdelivr.net/gh/alexthillen/better-markdown-anki@{TAG}/better-markdown-anki/dist/_better_markdown_anki.js'];
         function loadCSS(sources, index) {

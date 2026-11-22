@@ -1,5 +1,6 @@
 import importlib.util
 import sys
+import tempfile
 import types
 import unittest
 from pathlib import Path
@@ -47,6 +48,27 @@ def load_addon():
 
 
 class NoteTypeUpdatesTest(unittest.TestCase):
+    def test_user_stylesheet_is_created_without_overwriting_custom_css(self):
+        addon, _ = load_addon()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / '_better_markdown_anki_user_style.css'
+            addon.ensure_user_stylesheet(directory)
+            self.assertTrue(path.exists())
+            path.write_text('.card { color: rebeccapurple; }')
+            addon.ensure_user_stylesheet(directory)
+            self.assertEqual(path.read_text(), '.card { color: rebeccapurple; }')
+
+    def test_file_only_mobile_loader_migrates_without_changing_custom_content(self):
+        addon, mw = load_addon()
+        old = addon.FILE_MOBILE_SCRIPT.replace('{TAG}', 'v1.0.1').replace('{ADDON_PACKAGE}', '2100166052')
+        edited = old.replace('function loadCSS', 'function customLoader')
+        model = {'tmpls': [{'qfmt': 'custom front\n' + old, 'afmt': 'custom back\n' + edited}]}
+        mw.col.models.by_name.side_effect = lambda name: model if name.endswith('Basic') else None
+        self.assertEqual(addon.update_mobile_loader(), 1)
+        self.assertEqual(model['tmpls'][0]['qfmt'], 'custom front\n' + addon.SCRIPT_TEMPLATE)
+        self.assertEqual(model['tmpls'][0]['afmt'], 'custom back\n' + edited)
+        self.assertEqual(addon.update_mobile_loader(), 0)
+
     def test_mobile_loader_upgrade_preserves_other_customizations(self):
         addon, mw = load_addon()
         old = addon.LEGACY_SCRIPT.replace('{TAG}', 'v1.2.3').replace('{ADDON_PACKAGE}', '2100166052')
