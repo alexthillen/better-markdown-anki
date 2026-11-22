@@ -9,12 +9,18 @@ import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/dropzone/styles.css';
 import '@mantine/code-highlight/styles.css';
+import { handleExternalLink } from './externalLinks.js';
 
 // isCard check
 const basicIds = ['front-card-basic', 'back-card-basic', 'extra-card-basic'];
 const clozeIds = ['front-card-cloze', 'back-card-cloze', 'extra-card-cloze'];
 const isCard = [...basicIds, ...clozeIds].some(id => document.getElementById(id) !== null);
 document.body.classList.toggle('bma-review', isCard);
+
+// Open external-protocol links (e.g. obsidian://) through Anki's URL-scheme
+// dialog. Qt WebEngine silently drops main-frame navigations to schemes it
+// does not know, so they never reach Anki's acceptNavigationRequest handler.
+document.addEventListener('click', handleExternalLink, true);
 
 // Document setup for React
 const oldRoot = document.getElementById('root-react')

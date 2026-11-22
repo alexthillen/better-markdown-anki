@@ -466,6 +466,31 @@ if __name__ != "__main__":
     gui_hooks.editor_will_load_note.append(protect_editor_fields)
     gui_hooks.card_will_show.append(protect_review_html)
 
+    # A marker in the rendered card advertises this desktop-only bridge. It is
+    # not saved in the note or templates, so mobile cards use native navigation.
+    def _bma_mark_external_url_bridge(content, card, kind):
+        note_type = card.note().note_type()
+        if note_type and re.search(r'Better Markdown|SnapDeck', note_type['name'], re.I):
+            return '<span id="bma-external-url-bridge" hidden></span>' + content
+        return content
+
+    gui_hooks.card_will_show.append(_bma_mark_external_url_bridge)
+
+    # Open external-protocol links (e.g. obsidian://) clicked on cards.
+    # Qt WebEngine drops main-frame navigations to unknown URL schemes before
+    # they reach Anki, so the frontend forwards them via the pycmd bridge and
+    # they are handed to Anki's regular allow-once/always-allow dialog.
+    def _bma_open_external_url(message, cmd, context):
+        if isinstance(cmd, str) and cmd.startswith("bma-open-url:"):
+            from aqt.qt import QUrl
+            from aqt.url_schemes import open_url_if_supported_scheme
+
+            open_url_if_supported_scheme(QUrl(cmd[len("bma-open-url:"):]))
+            return (True, None)
+        return message
+
+    gui_hooks.webview_did_receive_js_message.append(_bma_open_external_url)
+
     # Hook into Anki's profile loading
     gui_hooks.profile_did_open.append(on_profile_loaded)
     gui_hooks.profile_will_close.append(stop_mcp_server)

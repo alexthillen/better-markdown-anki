@@ -1,6 +1,7 @@
 import { TypographyStylesProvider, useMantineColorScheme, Table } from '@mantine/core';
 import { useEffect, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
+import { ADDITIONAL_URL_PROTOCOLS } from '../externalLinks';
 import Viewer from 'viewerjs';
 import 'viewerjs/dist/viewer.css';
 import remarkMath from 'remark-math';
@@ -82,6 +83,22 @@ function decodeMarkdownMathContent(markdownText) {
     return res;
 }
 
+// Additional URL protocols whose links should stay clickable on cards
+// (e.g. obsidian:// note links). Qt WebEngine silently drops main-frame
+// navigations to schemes it does not know, so opening them is handled by
+// the click bridge in main.jsx together with Anki's URL-scheme dialog.
+const transformUrl = (url) => {
+    try {
+        const protocol = new URL(url, window.location.href).protocol.replace(':', '').toLowerCase();
+        if (ADDITIONAL_URL_PROTOCOLS.includes(protocol)) {
+            return url;
+        }
+    } catch {
+        // Relative or unparseable URL: fall through to the default transform.
+    }
+    return defaultUrlTransform(url);
+};
+
 // Custom sanitization schema for safe HTML rendering
 const createSanitizationSchema = () => {
     return {
@@ -108,7 +125,7 @@ const createSanitizationSchema = () => {
             'li': ['value'],
         },
         protocols: {
-            href: ['http', 'https', 'mailto', 'tel'],
+            href: ['http', 'https', 'mailto', 'tel', ...ADDITIONAL_URL_PROTOCOLS],
             src: ['http', 'https', 'data'],
         },
         strip: ['script', 'style', 'iframe', 'object', 'embed'],
@@ -319,6 +336,7 @@ const Markdown = ({
             <ReactMarkdown
                 remarkPlugins={[remarkMath, remarkGfm]} // Math and Table support
                 rehypePlugins={buildRehypePlugins()}
+                urlTransform={transformUrl}
                 components={{
                     span: ({ className, children, 'data-cloze': cloze, 'data-cloze-index': clozeIndex, 'data-ordinal': ordinal, ...props }) => {
                         const indexBadge = clozeIndex ? <ClozeIndexBadge index={clozeIndex} /> : null;
