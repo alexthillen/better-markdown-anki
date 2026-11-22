@@ -466,6 +466,16 @@ if __name__ != "__main__":
     gui_hooks.editor_will_load_note.append(protect_editor_fields)
     gui_hooks.card_will_show.append(protect_review_html)
 
+    # A marker in the rendered card advertises this desktop-only bridge. It is
+    # not saved in the note or templates, so mobile cards use native navigation.
+    def _bma_mark_external_url_bridge(content, card, kind):
+        note_type = card.note().note_type()
+        if note_type and re.search(r'Better Markdown|SnapDeck', note_type['name'], re.I):
+            return '<span id="bma-external-url-bridge" hidden></span>' + content
+        return content
+
+    gui_hooks.card_will_show.append(_bma_mark_external_url_bridge)
+
     # Open external-protocol links (e.g. obsidian://) clicked on cards.
     # Qt WebEngine drops main-frame navigations to unknown URL schemes before
     # they reach Anki, so the frontend forwards them via the pycmd bridge and
