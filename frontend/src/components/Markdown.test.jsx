@@ -130,6 +130,11 @@ describe('Markdown', () => {
         expect(anchor.getAttribute('href')).toBe('obsidian://open?vault=main&file=note.md');
     });
 
+    it('keeps notion:// links clickable', () => {
+        const container = renderMarkdown('[open notion](notion://www.notion.so/)');
+        expect(container.querySelector('a')?.getAttribute('href')).toBe('notion://www.notion.so/');
+    });
+
     it('still strips javascript: URLs from links', () => {
         const container = renderMarkdown('[click](javascript:alert(1))');
 

@@ -17,18 +17,18 @@ function click(href) {
 }
 
 describe('external link bridge', () => {
-    it('forwards Obsidian clicks when the desktop bridge is present', () => {
+    it.each(['obsidian://open', 'notion://www.notion.so/'])('forwards %s when the desktop bridge is present', (url) => {
         document.body.innerHTML = '<span id="bma-external-url-bridge" hidden></span>';
         const send = vi.fn();
         vi.stubGlobal('pycmd', send);
-        expect(click('obsidian://open')).toBe(true);
-        expect(send).toHaveBeenCalledWith('bma-open-url:obsidian://open');
+        expect(click(url)).toBe(true);
+        expect(send).toHaveBeenCalledWith(`bma-open-url:${url}`);
     });
 
-    it('leaves mobile clicks alone even if another pycmd exists', () => {
+    it.each(['obsidian://open', 'notion://www.notion.so/'])('leaves mobile %s clicks alone even if another pycmd exists', (url) => {
         const send = vi.fn();
         vi.stubGlobal('pycmd', send);
-        expect(click('obsidian://open')).toBe(false);
+        expect(click(url)).toBe(false);
         expect(send).not.toHaveBeenCalled();
     });
 

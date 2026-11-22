@@ -1,3 +1,5 @@
+export const ADDITIONAL_URL_PROTOCOLS = ['obsidian', 'notion'];
+
 export function handleExternalLink(event) {
     if (!document.getElementById('bma-external-url-bridge') || typeof pycmd !== 'function') return;
     const anchor = event.target?.closest?.('a[href]');
@@ -10,7 +12,7 @@ export function handleExternalLink(event) {
     } catch {
         return;
     }
-    if (protocol !== 'obsidian:') return;
+    if (!ADDITIONAL_URL_PROTOCOLS.includes(protocol.slice(0, -1))) return;
     event.preventDefault();
     pycmd(`bma-open-url:${href}`);
 }
