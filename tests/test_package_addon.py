@@ -17,7 +17,7 @@ class PackageTest(unittest.TestCase):
             package.package(output, 'v1.2.3')
             with zipfile.ZipFile(output) as archive:
                 names = archive.namelist()
-                for expected in ('__init__.py', 'mcp_server.py', 'markdown_validation.py', 'codex_setup.py', 'claude_setup.py', 'card_guidance.py', 'config.json', 'manifest.json', 'dist/_better_markdown_anki.js', 'guide/index.html', 'guide/script.js'):
+                for expected in ('__init__.py', 'mcp_server.py', 'markdown_validation.py', 'codex_setup.py', 'claude_setup.py', 'card_guidance.py', 'config.json', 'manifest.json', 'dist/_better_markdown_anki.js', 'templates/file_mobile_script.html', 'guide/index.html', 'guide/script.js'):
                     self.assertIn(expected, names)
                 self.assertFalse(any('__pycache__' in name or name.endswith('.pyc') for name in names))
                 self.assertEqual(json.loads(archive.read('manifest.json'))['version'], '1.2.3')

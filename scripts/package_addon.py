@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ADDON = ROOT / 'better-markdown-anki'
 PUBLIC_FILES = {'__init__.py', 'utils.py', 'fenced_code.py', 'card_guidance.py', 'claude_setup.py',
                 'mcp_server.py', 'markdown_validation.py', 'codex_setup.py', 'manifest.json', 'config.json', 'config.md'}
-PUBLIC_ASSETS = {'preview/script.js', 'templates/script.html', 'templates/legacy_script.html', 'templates/media_module_script.html', 'templates/style.css',
+PUBLIC_ASSETS = {'preview/script.js', 'templates/script.html', 'templates/legacy_script.html', 'templates/media_module_script.html', 'templates/file_mobile_script.html', 'templates/style.css',
                  'templates/basic/front.html', 'templates/basic/back.html',
                  'templates/cloze/front.html', 'templates/cloze/back.html'}
 GUIDE_FILES = ('index.html', 'styles.css', 'script.js', 'snapdeck-logo.svg', 'mountain.svg', '_walkthrough.html')

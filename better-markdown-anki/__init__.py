@@ -5,7 +5,7 @@ from anki.models import ModelManager
 from anki.hooks import addHook
 from anki.lang import _
 from anki.collection import Collection
-from .utils import add_folder_to_media, patch_variables_in_file
+from .utils import add_folder_to_media, ensure_user_stylesheet, patch_variables_in_file
 from .fenced_code import protect_editor_fields, protect_review_html
 
 
@@ -31,6 +31,7 @@ SCRIPT_TEMPLATE = patch_variables_in_file(
 CSS_TEMPLATE = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "style.css"), dict(TAG=TAG))
 LEGACY_SCRIPT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "legacy_script.html"), dict())
 MEDIA_MODULE_SCRIPT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "media_module_script.html"), dict())
+FILE_MOBILE_SCRIPT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "file_mobile_script.html"), dict())
 BASIC_TEMPLATE_FRONT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "basic", "front.html"), dict()) + SCRIPT_TEMPLATE
 BASIC_TEMPLATE_BACK = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "basic", "back.html"), dict()) + SCRIPT_TEMPLATE
 CLOZE_TEMPLATE_FRONT = patch_variables_in_file(os.path.join(TEMPLATE_DIR, "cloze", "front.html"), dict()) + SCRIPT_TEMPLATE
@@ -263,7 +264,7 @@ def update_existing_note_type(note_type_name: str, update_templates: bool = Fals
 def update_mobile_loader():
     """Replace only an exact, recognized old loader, keeping other template edits."""
     patterns = []
-    for old_script in (LEGACY_SCRIPT, MEDIA_MODULE_SCRIPT):
+    for old_script in (LEGACY_SCRIPT, MEDIA_MODULE_SCRIPT, FILE_MOBILE_SCRIPT):
         escaped = re.escape(old_script)
         escaped = escaped.replace(re.escape('{TAG}'), r"[^'\"\r\n]+")
         escaped = escaped.replace(re.escape('{ADDON_PACKAGE}'), r"[^/'\"\r\n]+")
@@ -459,6 +460,7 @@ if __name__ != "__main__":
         update_mobile_loader()
         add_folder_to_media(DIST_DIRECTORY, overwrite=True)
         add_folder_to_media(PREVIEW_DIRECTORY, overwrite=True)
+        ensure_user_stylesheet(mw.col.media.dir())
         install_codex_action()
         start_mcp_server()
         maybe_show_upgrade_notice(existing)
